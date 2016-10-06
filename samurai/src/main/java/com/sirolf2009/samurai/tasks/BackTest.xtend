@@ -21,7 +21,6 @@ import javafx.scene.control.TreeItem
 import javafx.scene.paint.Color
 import org.joda.time.DateTime
 import org.joda.time.Period
-import javafx.application.Platform
 
 class BackTest extends Task<Void> implements InvalidationListener {
 
@@ -83,17 +82,14 @@ class BackTest extends Task<Void> implements InvalidationListener {
 			val sma = new SMAIndicator(new ClosePriceIndicator(series), 8)
 			val chart = new Chart(series, #[sma])
 
-			Platform.runLater [
-				val g = samurai.canvas.graphicsContext2D
-				g.save()
-				g.fill = Color.BLACK.brighter
-				g.fillRect(0, 0, samurai.canvas.width, samurai.canvas.height)
+			val g = samurai.canvas.graphicsContext2D
+			g.save()
+			g.fill = Color.BLACK.brighter
+			g.fillRect(0, 0, samurai.canvas.width, samurai.canvas.height)
 
-				new RendererDefault().drawChart(chart, samurai.canvas, g, 0, 0.5)
+			new RendererDefault().drawChart(chart, samurai.canvas, g, 0, 0.5)
 
-				println("draw " + samurai.canvas.layoutBounds)
-				g.restore()
-			]
+			g.restore()
 		}
 	}
 

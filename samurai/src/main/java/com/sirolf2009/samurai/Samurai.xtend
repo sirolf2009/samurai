@@ -1,20 +1,20 @@
 package com.sirolf2009.samurai
 
 import com.sirolf2009.samurai.dataprovider.DataProviderBitcoinCharts
+import com.sirolf2009.samurai.gui.ResizableCanvas
 import com.sirolf2009.samurai.gui.TreeItemDataProvider
 import com.sirolf2009.samurai.tasks.BackTest
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.canvas.Canvas
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.TextField
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
+import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
-import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import org.eclipse.xtend.lib.annotations.Accessors
@@ -28,22 +28,27 @@ import static extension xtendfx.scene.SceneBuilder.*
 	val progressMessage = new Label()
 	val progressIndicator = new ProgressBar(0)
 	
-	val Canvas canvas = new Canvas(400, 500)
+	val canvas = new ResizableCanvas(400, 500)
 	val backTest = new BackTest(this)
 
 	override void start(Stage it) {
-		BorderedScene[
+		val scene = BorderedScene[
 			bottom = new HBox(8, progressMessage, progressIndicator) => [
 				alignment = Pos.BASELINE_RIGHT
 			]
 
-			val container = new VBox(canvas)
-			HBox.setHgrow(container, Priority.ALWAYS)
-			canvas.widthProperty().bind(container.widthProperty())
-			canvas.heightProperty().bind(container.heightProperty())
+			val container = new AnchorPane(canvas)
+			container.minWidth = 0
+			container.minHeight = 0
+			canvas.widthProperty.bind(container.widthProperty())
+			canvas.heightProperty.bind(container.heightProperty())
+			container.widthProperty().addListener([backTest.draw()])
+			container.heightProperty().addListener([backTest.draw()])
+			AnchorPane.setBottomAnchor(canvas, 0D)
+			AnchorPane.setTopAnchor(canvas, 0D)
+			AnchorPane.setLeftAnchor(canvas, 0D)
+			AnchorPane.setRightAnchor(canvas, 0D)
 			center = container
-			canvas.widthProperty.addListener([backTest.draw()])
-			canvas.heightProperty.addListener([backTest.draw()])
 			left = new VBox(new TreeView => [
 				root = new TreeItem("Symbol") => [
 					children += new TreeItem("BitcoinCharts") => [
@@ -63,6 +68,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 				add(new Button("Run Backtest"), 1, 4)
 			])
 		]
+		scene.root.prefWidth(1)
 		title = "Samurai"
 		width = 800
 		height = 600
