@@ -2,6 +2,8 @@ package com.sirolf2009.samurai.tasks
 
 import com.sirolf2009.samurai.Samurai
 import com.sirolf2009.samurai.gui.TreeItemDataProvider
+import com.sirolf2009.samurai.renderer.RendererDefault
+import com.sirolf2009.samurai.renderer.chart.Chart
 import com.sirolf2009.samurai.strategy.StrategySMACrossover
 import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.analysis.CashFlow
@@ -9,14 +11,17 @@ import eu.verdelhan.ta4j.analysis.criteria.AverageProfitableTradesCriterion
 import eu.verdelhan.ta4j.analysis.criteria.RewardRiskRatioCriterion
 import eu.verdelhan.ta4j.analysis.criteria.TotalProfitCriterion
 import eu.verdelhan.ta4j.analysis.criteria.VersusBuyAndHoldCriterion
+import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator
+import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator
 import javafx.beans.InvalidationListener
 import javafx.beans.Observable
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.concurrent.Task
 import javafx.scene.control.TreeItem
+import javafx.scene.paint.Color
 import org.joda.time.DateTime
 import org.joda.time.Period
-import com.sirolf2009.samurai.renderer.RendererDefault
+import javafx.application.Platform
 
 class BackTest extends Task<Void> implements InvalidationListener {
 
@@ -39,14 +44,10 @@ class BackTest extends Task<Void> implements InvalidationListener {
 				samurai.progressIndicator.progressProperty.bind(progressProperty)
 			]
 			new Thread(provider).start()
-			
+
 			provider.onSucceeded = [
 				series = it.source.value as TimeSeries
-				samurai.progressMessage.textProperty.bind(this.messageProperty)
-				samurai.progressIndicator.progressProperty.bind(this.progressProperty)
-				new Thread(this).start()
-				
-				new RendererDefault().drawTimeSeries(series, samurai.canvas, samurai.canvas.graphicsContext2D, 10, 0.5)
+				draw()
 			]
 		}
 	}
@@ -68,8 +69,32 @@ class BackTest extends Task<Void> implements InvalidationListener {
 
 		val vsBuyAndHold = new VersusBuyAndHoldCriterion(new TotalProfitCriterion())
 		System.out.println("Our profit vs buy-and-hold profit: " + vsBuyAndHold.calculate(series, tradingRecord))
-		
+
 		return null
+	}
+
+	def draw() {
+		if(series != null) {
+
+			samurai.progressMessage.textProperty.bind(this.messageProperty)
+			samurai.progressIndicator.progressProperty.bind(this.progressProperty)
+			new Thread(this).start()
+
+			val sma = new SMAIndicator(new ClosePriceIndicator(series), 8)
+			val chart = new Chart(series, #[sma])
+
+			Platform.runLater [
+				val g = samurai.canvas.graphicsContext2D
+				g.save()
+				g.fill = Color.BLACK.brighter
+				g.fillRect(0, 0, samurai.canvas.width, samurai.canvas.height)
+
+				new RendererDefault().drawChart(chart, samurai.canvas, g, 0, 0.5)
+
+				println("draw " + samurai.canvas.layoutBounds)
+				g.restore()
+			]
+		}
 	}
 
 }

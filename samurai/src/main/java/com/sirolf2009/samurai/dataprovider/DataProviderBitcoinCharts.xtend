@@ -40,9 +40,9 @@ class DataProviderBitcoinCharts extends DataProvider {
 				ticksQueue.poll
 			}
 			ticksQueue.peek => [
-				val price = Double.parseDouble(data.get(1));
-				val amount = Double.parseDouble(data.get(2));
-				addTrade(price, amount)
+				val price = Double.parseDouble(data.get(1))
+				val amount = Double.parseDouble(data.get(2))
+				addTrade(amount, price)
 				updateMessage("Loading "+time.getYear+"-"+time.getMonthOfYear+"-"+time.getDayOfMonth)
 			]
 			progress += line.bytes.length
