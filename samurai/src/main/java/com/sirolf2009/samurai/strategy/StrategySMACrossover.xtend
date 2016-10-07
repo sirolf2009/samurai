@@ -12,18 +12,25 @@ import eu.verdelhan.ta4j.trading.rules.StopLossRule
 
 class StrategySMACrossover implements IStrategy {
 	
+	var SMAIndicator shortSma
+	var SMAIndicator longSma
+	
 	override setup(TimeSeries series) {
 		val closePrice = new ClosePriceIndicator(series)
 
-        val shortSma = new SMAIndicator(closePrice, 5);
-        val longSma = new SMAIndicator(closePrice, 30);
+        shortSma = new SMAIndicator(closePrice, 5)
+        longSma = new SMAIndicator(closePrice, 30)
 
         val buyingRule = new CrossedUpIndicatorRule(shortSma, longSma)
         val sellingRule = new CrossedDownIndicatorRule(shortSma, longSma)
                 .or(new StopLossRule(closePrice, Decimal.valueOf("3")))
-                .or(new StopGainRule(closePrice, Decimal.valueOf("2")));
+                .or(new StopGainRule(closePrice, Decimal.valueOf("2")))
         
         return new Strategy(buyingRule, sellingRule);
+	}
+	
+	override indicators(TimeSeries series) {
+        return #[shortSma, longSma]
 	}
 	
 }

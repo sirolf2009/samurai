@@ -2,6 +2,8 @@ package com.sirolf2009.samurai.renderer
 
 import com.sirolf2009.samurai.renderer.chart.ChartData
 import com.sirolf2009.samurai.renderer.chart.NumberAxis
+import eu.verdelhan.ta4j.Decimal
+import eu.verdelhan.ta4j.Indicator
 import eu.verdelhan.ta4j.Tick
 import eu.verdelhan.ta4j.TimeSeries
 import java.util.List
@@ -9,8 +11,6 @@ import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
-import eu.verdelhan.ta4j.Indicator
-import eu.verdelhan.ta4j.Decimal
 
 class RendererDefault implements IRenderer {
 
@@ -122,6 +122,11 @@ class RendererDefault implements IRenderer {
 		g.restore()
 		
 		drawYAxis(g, height, minPrice, maxPrice)
+		drawIndicatorName(indicator, g)
+	}
+	
+	def drawIndicatorName(Indicator<?> indicator, GraphicsContext g) {
+		g.fillText(indicator.toString(), AXIS_SIZE+2, g.font.size+2)
 	}
 	
 	def drawYAxis(GraphicsContext g, double height, double minPrice, double maxPrice) {

@@ -5,9 +5,13 @@ import com.sirolf2009.samurai.gui.ResizableCanvas
 import com.sirolf2009.samurai.gui.TreeItemDataProvider
 import com.sirolf2009.samurai.renderer.chart.Chart
 import com.sirolf2009.samurai.renderer.chart.ChartData
+import com.sirolf2009.samurai.strategy.StrategySMACrossover
 import com.sirolf2009.samurai.tasks.BackTest
 import eu.verdelhan.ta4j.TimeSeries
+import eu.verdelhan.ta4j.TradingRecord
+import java.io.FileInputStream
 import javafx.beans.property.ReadOnlyObjectProperty
+import javafx.beans.value.ChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.Button
@@ -16,10 +20,12 @@ import javafx.scene.control.ProgressBar
 import javafx.scene.control.TextField
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
+import javafx.scene.image.Image
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import javafx.stage.Stage
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.joda.time.DateTime
@@ -28,8 +34,6 @@ import xtendfx.FXApp
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
 import static extension xtendfx.scene.SceneBuilder.*
-import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator
-import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator
 
 @FXApp @Accessors class Samurai {
 
@@ -37,7 +41,7 @@ import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator
 	val progressIndicator = new ProgressBar(0)
 
 	val canvas = new ResizableCanvas(400, 500)
-	val backTest = new BackTest(this)
+	var BackTest backTest
 	var Chart chart
 
 	override void start(Stage it) {
@@ -51,8 +55,15 @@ import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator
 			container.minHeight = 0
 			canvas.widthProperty.bind(container.widthProperty())
 			canvas.heightProperty.bind(container.heightProperty())
-			container.widthProperty().addListener([chart?.draw()])
-			container.heightProperty().addListener([chart?.draw()])
+			val ChangeListener<? super Number> onResize = [
+				if(chart != null) {
+					chart.draw()
+				} else {
+					drawIcon()
+				}
+			]
+			container.widthProperty().addListener(onResize)
+			container.heightProperty().addListener(onResize)
 			AnchorPane.setBottomAnchor(canvas, 0D)
 			AnchorPane.setTopAnchor(canvas, 0D)
 			AnchorPane.setLeftAnchor(canvas, 0D)
@@ -80,14 +91,13 @@ import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator
 						new Thread(provider).start()
 
 						provider.onSucceeded = [
-							backTest.series = it.source.value as TimeSeries
+							backTest = new BackTest(this, new StrategySMACrossover(), it.source.value as TimeSeries)
 
 							progressMessage.textProperty.bind(backTest.messageProperty)
 							progressIndicator.progressProperty.bind(backTest.progressProperty)
 
 							backTest.onSucceeded = [
-								val sma = new SMAIndicator(new ClosePriceIndicator(backTest.series), 8)
-								chart = new Chart(this, backTest.series, backTest.tradingRecord, new ChartData(backTest.series, #[sma]))
+								chart = new Chart(this, backTest.series, it.source.value as TradingRecord, new ChartData(backTest.series, backTest.strategy.indicators(backTest.series)))
 								chart.draw()
 							]
 							new Thread(backTest).start()
@@ -108,6 +118,14 @@ import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator
 		width = 800
 		height = 600
 		show
+	}
+	
+	def drawIcon() {
+		val g = canvas.graphicsContext2D
+		g.fill = Color.BLACK.brighter
+		g.fillRect(0, 0, canvas.width, canvas.height)
+		val image = new Image(new FileInputStream("src/main/resources/icon.png"))
+		g.drawImage(image, canvas.width/2-image.width/2, canvas.height/2-image.height/2)
 	}
 
 }

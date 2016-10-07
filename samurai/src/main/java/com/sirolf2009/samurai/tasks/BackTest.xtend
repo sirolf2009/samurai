@@ -1,103 +1,43 @@
 package com.sirolf2009.samurai.tasks
 
 import com.sirolf2009.samurai.Samurai
-import com.sirolf2009.samurai.gui.TreeItemDataProvider
-import com.sirolf2009.samurai.renderer.RendererDefault
-import com.sirolf2009.samurai.renderer.chart.ChartData
-import com.sirolf2009.samurai.strategy.StrategySMACrossover
+import com.sirolf2009.samurai.strategy.IStrategy
 import eu.verdelhan.ta4j.TimeSeries
-import eu.verdelhan.ta4j.analysis.CashFlow
-import eu.verdelhan.ta4j.analysis.criteria.AverageProfitableTradesCriterion
-import eu.verdelhan.ta4j.analysis.criteria.RewardRiskRatioCriterion
-import eu.verdelhan.ta4j.analysis.criteria.TotalProfitCriterion
-import eu.verdelhan.ta4j.analysis.criteria.VersusBuyAndHoldCriterion
-import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator
-import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator
-import javafx.beans.InvalidationListener
-import javafx.beans.Observable
-import javafx.beans.property.ReadOnlyObjectProperty
-import javafx.concurrent.Task
-import javafx.scene.control.TreeItem
-import javafx.scene.paint.Color
-import org.joda.time.DateTime
-import org.joda.time.Period
 import eu.verdelhan.ta4j.TradingRecord
+import javafx.concurrent.Task
 import org.eclipse.xtend.lib.annotations.Accessors
 
-@Accessors class BackTest extends Task<Void> implements InvalidationListener {
+@Accessors class BackTest extends Task<TradingRecord> {
 
 	val Samurai samurai
-	var TimeSeries series
-	var TradingRecord tradingRecord
+	val IStrategy strategy
+	val TimeSeries series
 
-	new(Samurai samurai) {
+	new(Samurai samurai, IStrategy strategy, TimeSeries series) {
 		this.samurai = samurai
-	}
-
-	override invalidated(Observable observable) {
-		val node = (observable as ReadOnlyObjectProperty<TreeItem<String>>).value
-		if(node instanceof TreeItemDataProvider) {
-			val provider = (node as TreeItemDataProvider).provider
-			provider => [
-				period = new Period(1000 * 60 * 60)
-				from = new DateTime(0)
-				to = new DateTime(System.currentTimeMillis)
-				samurai.progressMessage.textProperty.bind(messageProperty)
-				samurai.progressIndicator.progressProperty.bind(progressProperty)
-			]
-			new Thread(provider).start()
-
-			provider.onSucceeded = [
-				series = it.source.value as TimeSeries
-
-				samurai.progressMessage.textProperty.bind(this.messageProperty)
-				samurai.progressIndicator.progressProperty.bind(this.progressProperty)
-				
-				onSucceeded = [draw()]
-
-				new Thread(this).start()
-			]
-		}
+		this.strategy = strategy
+		this.series = series
 	}
 
 	override protected call() throws Exception {
 		updateMessage("Running backtest")
-		val strat = new StrategySMACrossover()
-		tradingRecord = series.run(strat.setup(series))
+		val tradingRecord = series.run(strategy.setup(series))
+		updateMessage("Done")
+//
+//		updateMessage("Parsing results")
+//		val cashFlow = new CashFlow(series, tradingRecord)
+//		println("Net Profit: " + cashFlow.getValue(cashFlow.size - 1))
+//
+//		val profitTradesRatio = new AverageProfitableTradesCriterion()
+//		System.out.println("Profitable trades ratio: " + profitTradesRatio.calculate(series, tradingRecord))
+//
+//		val rewardRiskRatio = new RewardRiskRatioCriterion()
+//		System.out.println("Reward-risk ratio: " + rewardRiskRatio.calculate(series, tradingRecord))
+//
+//		val vsBuyAndHold = new VersusBuyAndHoldCriterion(new TotalProfitCriterion())
+//		System.out.println("Our profit vs buy-and-hold profit: " + vsBuyAndHold.calculate(series, tradingRecord))
 
-		updateMessage("Parsing results")
-		val cashFlow = new CashFlow(series, tradingRecord)
-		println("Net Profit: " + cashFlow.getValue(cashFlow.size - 1))
-
-		val profitTradesRatio = new AverageProfitableTradesCriterion()
-		System.out.println("Profitable trades ratio: " + profitTradesRatio.calculate(series, tradingRecord))
-
-		val rewardRiskRatio = new RewardRiskRatioCriterion()
-		System.out.println("Reward-risk ratio: " + rewardRiskRatio.calculate(series, tradingRecord))
-
-		val vsBuyAndHold = new VersusBuyAndHoldCriterion(new TotalProfitCriterion())
-		System.out.println("Our profit vs buy-and-hold profit: " + vsBuyAndHold.calculate(series, tradingRecord))
-
-		return null
-	}
-
-	def draw() {
-		if(series != null) {
-
-			val sma = new SMAIndicator(new ClosePriceIndicator(series), 8)
-			println(tradingRecord.trades.get(0))
-			val cash = new CashFlow(series, tradingRecord)
-			val chart = new ChartData(series, #[sma, cash])
-
-			val g = samurai.canvas.graphicsContext2D
-			g.save()
-			g.fill = Color.BLACK.brighter
-			g.fillRect(0, 0, samurai.canvas.width, samurai.canvas.height)
-
-			new RendererDefault().drawChart(chart, samurai.canvas, g, 0, 0.5)
-
-			g.restore()
-		}
+		return tradingRecord
 	}
 
 }

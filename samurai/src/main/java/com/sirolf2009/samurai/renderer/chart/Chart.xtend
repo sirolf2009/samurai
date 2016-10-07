@@ -30,12 +30,12 @@ class Chart {
 		this.tradingRecord = tradingRecord
 		this.data = data
 		canvas = samurai.canvas
-		scrollX = 1
+		scrollX = 0
 		zoomX = 1
 		
 		canvas.onMousePressed = [
 			if(button == MouseButton.PRIMARY) {
-				dragDetector = new DragDetector(renderer, sceneX, scrollX)
+				dragDetector = new DragDetector(renderer, series, sceneX, scrollX)
 			}
 		]
 		canvas.onMouseDragged = [
@@ -62,11 +62,13 @@ class Chart {
 	static class DragDetector {
 		
 		val IRenderer renderer
+		val TimeSeries series
 		val double startX
 		var int scrollX
 		
-		new(IRenderer renderer, double startX, int scrollX) {
+		new(IRenderer renderer, TimeSeries series, double startX, int scrollX) {
 			this.renderer = renderer
+			this.series = series
 			this.startX = startX
 			this.scrollX = scrollX
 		}
@@ -75,7 +77,8 @@ class Chart {
 			val newX = event.sceneX
 			val delta = startX - newX
 			val ticks = Math.floor(Math.abs(delta)) as int
-			return if(delta < 0) Math.max(1, scrollX-ticks) else Math.max(1, scrollX+ticks)
+			val newScrollX = if(delta < 0) scrollX-ticks else scrollX+ticks
+			return Math.max(0, newScrollX)
 		}
 		
 	}
