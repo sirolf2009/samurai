@@ -1,13 +1,83 @@
 package com.sirolf2009.samurai.renderer.chart
 
-import org.eclipse.xtend.lib.annotations.Data
+import com.sirolf2009.samurai.Samurai
+import com.sirolf2009.samurai.renderer.RendererDefault
 import eu.verdelhan.ta4j.TimeSeries
-import eu.verdelhan.ta4j.Indicator
-import java.util.List
+import eu.verdelhan.ta4j.TradingRecord
+import javafx.scene.canvas.Canvas
+import javafx.scene.input.MouseButton
+import javafx.scene.paint.Color
+import javafx.scene.input.MouseEvent
+import com.sirolf2009.samurai.renderer.IRenderer
 
-@Data class Chart {
+class Chart {
 	
-	TimeSeries timeseries
-	List<Indicator<?>> indicators
+	static val renderer = new RendererDefault()
+	
+	val Samurai samurai
+	val TimeSeries series
+	val TradingRecord tradingRecord
+	val ChartData data
+	val Canvas canvas
+	
+	var DragDetector dragDetector
+	var int scrollX
+	var double zoomX
+	
+	new(Samurai samurai, TimeSeries series, TradingRecord tradingRecord, ChartData data) {
+		this.samurai = samurai
+		this.series = series
+		this.tradingRecord = tradingRecord
+		this.data = data
+		canvas = samurai.canvas
+		scrollX = 1
+		zoomX = 1
+		
+		canvas.onMousePressed = [
+			if(button == MouseButton.PRIMARY) {
+				dragDetector = new DragDetector(renderer, sceneX, scrollX)
+			}
+		]
+		canvas.onMouseDragged = [
+			if(button == MouseButton.PRIMARY) {
+				scrollX = dragDetector.getScrollX(it)
+				draw()
+			}
+		]
+	}
+	
+	def draw() {
+		if(series != null) {
+			val g = canvas.graphicsContext2D
+			g.save()
+			g.fill = Color.BLACK.brighter
+			g.fillRect(0, 0, canvas.width, canvas.height)
+
+			renderer.drawChart(data, canvas, g, scrollX, zoomX)
+
+			g.restore()
+		}
+	}
+	
+	static class DragDetector {
+		
+		val IRenderer renderer
+		val double startX
+		var int scrollX
+		
+		new(IRenderer renderer, double startX, int scrollX) {
+			this.renderer = renderer
+			this.startX = startX
+			this.scrollX = scrollX
+		}
+		
+		def getScrollX(MouseEvent event) {
+			val newX = event.sceneX
+			val delta = startX - newX
+			val ticks = Math.floor(Math.abs(delta)) as int
+			return if(delta < 0) Math.max(1, scrollX-ticks) else Math.max(1, scrollX+ticks)
+		}
+		
+	}
 	
 }

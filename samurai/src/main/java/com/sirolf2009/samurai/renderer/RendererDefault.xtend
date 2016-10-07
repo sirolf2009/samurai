@@ -1,6 +1,6 @@
 package com.sirolf2009.samurai.renderer
 
-import com.sirolf2009.samurai.renderer.chart.Chart
+import com.sirolf2009.samurai.renderer.chart.ChartData
 import com.sirolf2009.samurai.renderer.chart.NumberAxis
 import eu.verdelhan.ta4j.Tick
 import eu.verdelhan.ta4j.TimeSeries
@@ -21,7 +21,7 @@ class RendererDefault implements IRenderer {
 	static val AXIS_SIZE = 48
 	static val AXIS_OFFSET = 16
 
-	override drawChart(Chart chart, Canvas canvas, GraphicsContext g, int x, double scaleX) {
+	override drawChart(ChartData chart, Canvas canvas, GraphicsContext g, int x, double scaleX) {
 		val panels = 2 + chart.indicators.size //price chart counts as 2, because it should be twice as big
 		val heightPerPanel = canvas.height / panels
 		
@@ -145,6 +145,10 @@ class RendererDefault implements IRenderer {
 
 	def map(double x, double in_min, double in_max, double out_min, double out_max) {
 		return out_min + ((out_max - out_min) / (in_max - in_min)) * (x - in_min)
+	}
+	
+	override getTickSize() {
+		return WIDTH_TICK
 	}
 	
 }

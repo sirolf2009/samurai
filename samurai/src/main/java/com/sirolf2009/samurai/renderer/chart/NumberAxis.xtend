@@ -17,7 +17,7 @@ import org.eclipse.xtend.lib.annotations.Data
 		val minValue = minValueUgly.pretty
 		val range = (maxValue - minValue)
 		val exponent = Math.log10(range)
-		val unroundedTickSize = range / (((length / 16) as int) - 1)
+		val unroundedTickSize = range / (((length / 32) as int) - 1)
 		val x = Math.ceil(Math.log10(unroundedTickSize) - 1)
 		val pow10x = Math.pow(10, x)
 		val roundedTickRange = Math.ceil(unroundedTickSize / pow10x) * pow10x

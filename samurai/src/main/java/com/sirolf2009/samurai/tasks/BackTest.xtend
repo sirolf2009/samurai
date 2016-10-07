@@ -3,7 +3,7 @@ package com.sirolf2009.samurai.tasks
 import com.sirolf2009.samurai.Samurai
 import com.sirolf2009.samurai.gui.TreeItemDataProvider
 import com.sirolf2009.samurai.renderer.RendererDefault
-import com.sirolf2009.samurai.renderer.chart.Chart
+import com.sirolf2009.samurai.renderer.chart.ChartData
 import com.sirolf2009.samurai.strategy.StrategySMACrossover
 import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.analysis.CashFlow
@@ -21,11 +21,14 @@ import javafx.scene.control.TreeItem
 import javafx.scene.paint.Color
 import org.joda.time.DateTime
 import org.joda.time.Period
+import eu.verdelhan.ta4j.TradingRecord
+import org.eclipse.xtend.lib.annotations.Accessors
 
-class BackTest extends Task<Void> implements InvalidationListener {
+@Accessors class BackTest extends Task<Void> implements InvalidationListener {
 
 	val Samurai samurai
 	var TimeSeries series
+	var TradingRecord tradingRecord
 
 	new(Samurai samurai) {
 		this.samurai = samurai
@@ -46,7 +49,13 @@ class BackTest extends Task<Void> implements InvalidationListener {
 
 			provider.onSucceeded = [
 				series = it.source.value as TimeSeries
-				draw()
+
+				samurai.progressMessage.textProperty.bind(this.messageProperty)
+				samurai.progressIndicator.progressProperty.bind(this.progressProperty)
+				
+				onSucceeded = [draw()]
+
+				new Thread(this).start()
 			]
 		}
 	}
@@ -54,7 +63,7 @@ class BackTest extends Task<Void> implements InvalidationListener {
 	override protected call() throws Exception {
 		updateMessage("Running backtest")
 		val strat = new StrategySMACrossover()
-		val tradingRecord = series.run(strat.setup(series))
+		tradingRecord = series.run(strat.setup(series))
 
 		updateMessage("Parsing results")
 		val cashFlow = new CashFlow(series, tradingRecord)
@@ -75,12 +84,10 @@ class BackTest extends Task<Void> implements InvalidationListener {
 	def draw() {
 		if(series != null) {
 
-			samurai.progressMessage.textProperty.bind(this.messageProperty)
-			samurai.progressIndicator.progressProperty.bind(this.progressProperty)
-			new Thread(this).start()
-
 			val sma = new SMAIndicator(new ClosePriceIndicator(series), 8)
-			val chart = new Chart(series, #[sma])
+			println(tradingRecord.trades.get(0))
+			val cash = new CashFlow(series, tradingRecord)
+			val chart = new ChartData(series, #[sma, cash])
 
 			val g = samurai.canvas.graphicsContext2D
 			g.save()
