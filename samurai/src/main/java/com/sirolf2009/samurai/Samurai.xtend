@@ -117,6 +117,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 		title = "Samurai"
 		width = 800
 		height = 600
+		icons += new Image(new FileInputStream("src/main/resources/icon.png"))
 		show
 	}
 	
