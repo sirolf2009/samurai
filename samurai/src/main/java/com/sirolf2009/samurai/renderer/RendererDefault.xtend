@@ -38,6 +38,10 @@ class RendererDefault implements IRenderer {
 	}
 
 	def drawTimeseries(TimeSeries series, GraphicsContext g, double width, double height, int x, double scaleX) {
+		g.setLineWidth(1)
+		g.fill = Color.WHITE
+		g.fillText(series.name, AXIS_SIZE+2, g.font.size+2)
+		
 		val panelWidth = width - AXIS_SIZE - AXIS_OFFSET
 		val panelHeight = height - AXIS_OFFSET
 		
