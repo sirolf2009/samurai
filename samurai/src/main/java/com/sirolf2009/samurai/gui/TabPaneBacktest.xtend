@@ -1,7 +1,9 @@
 package com.sirolf2009.samurai.gui
 
+import com.sirolf2009.samurai.AbsoluteProfitCriterion
 import com.sirolf2009.samurai.Samurai
 import com.sirolf2009.samurai.dataprovider.DataProvider
+import com.sirolf2009.samurai.gui.TabPaneBacktest.TableTrade
 import com.sirolf2009.samurai.renderer.chart.Chart
 import com.sirolf2009.samurai.renderer.chart.ChartData
 import com.sirolf2009.samurai.renderer.chart.ChartIndicator
@@ -15,13 +17,16 @@ import eu.verdelhan.ta4j.analysis.criteria.AverageProfitCriterion
 import eu.verdelhan.ta4j.analysis.criteria.AverageProfitableTradesCriterion
 import eu.verdelhan.ta4j.analysis.criteria.MaximumDrawdownCriterion
 import eu.verdelhan.ta4j.analysis.criteria.NumberOfTradesCriterion
-import eu.verdelhan.ta4j.analysis.criteria.TotalProfitCriterion
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
+import javafx.beans.value.ObservableValue
 import javafx.geometry.Insets
 import javafx.scene.control.Label
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import javafx.scene.control.TableColumn
+import javafx.scene.control.TableColumn.CellDataFeatures
+import javafx.scene.control.TableView
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
@@ -32,12 +37,17 @@ import javafx.scene.layout.BorderWidths
 import javafx.scene.layout.CornerRadii
 import javafx.scene.layout.GridPane
 import javafx.scene.paint.Color
+import javafx.util.Callback
 import org.joda.time.DateTime
 import org.joda.time.Period
+import xtendfx.beans.FXBindable
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
+import java.text.DecimalFormat
 
 class TabPaneBacktest extends TabPane {
+	
+	static val moneyFormat = new DecimalFormat("$###,###,###,##0.00")
 
 	var Chart chart
 
@@ -77,12 +87,12 @@ class TabPaneBacktest extends TabPane {
 						details.add(getLabel.apply(value + ""), 1, row)
 					]
 
-					addDetail.apply(0, "Net profit", new TotalProfitCriterion().calculate(backTest.series, tradingRecord))
+					addDetail.apply(0, "Net profit", moneyFormat.format(new AbsoluteProfitCriterion().calculate(backTest.series, tradingRecord)))
 					addDetail.apply(1, "# Trades", new NumberOfTradesCriterion().calculate(backTest.series, tradingRecord) as int)
-					addDetail.apply(2, "% Profitable", new AverageProfitableTradesCriterion().calculate(backTest.series, tradingRecord)*100)
-					addDetail.apply(3, "Max drawdown", new MaximumDrawdownCriterion().calculate(backTest.series, tradingRecord))
-					addDetail.apply(4, "Average profit per trade", new AverageProfitCriterion().calculate(backTest.series, tradingRecord))
-					
+					addDetail.apply(2, "% Profitable", new AverageProfitableTradesCriterion().calculate(backTest.series, tradingRecord) * 100)
+					addDetail.apply(3, "Max drawdown", moneyFormat.format(new MaximumDrawdownCriterion().calculate(backTest.series, tradingRecord)))
+					addDetail.apply(4, "Average profit per trade", moneyFormat.format(new AverageProfitCriterion().calculate(backTest.series, tradingRecord)))
+
 					details.showGridLines()
 					details.stretchGrid(1, 4)
 
@@ -143,10 +153,95 @@ class TabPaneBacktest extends TabPane {
 						chart.draw()
 					]
 				]
+				new Tab("Trades") => [
+					val table = new TableView<TableTrade>()
+
+					val nrCol = new TableColumn("Nr")
+					nrCol.cellValueFactory = new Callback<CellDataFeatures<TableTrade, String>, ObservableValue<String>> {
+						override call(CellDataFeatures<TableTrade, String> param) {
+							return param.value.nrProperty
+						}
+					}
+					val directionCol = new TableColumn("Direction")
+					directionCol.cellValueFactory = new Callback<CellDataFeatures<TableTrade, String>, ObservableValue<String>> {
+						override call(CellDataFeatures<TableTrade, String> param) {
+							return param.value.directionProperty
+						}
+					}
+					val fromCol = new TableColumn("From")
+					fromCol.cellValueFactory = new Callback<CellDataFeatures<TableTrade, String>, ObservableValue<String>> {
+						override call(CellDataFeatures<TableTrade, String> param) {
+							return param.value.fromProperty
+						}
+					}
+					val toCol = new TableColumn("To")
+					toCol.cellValueFactory = new Callback<CellDataFeatures<TableTrade, String>, ObservableValue<String>> {
+						override call(CellDataFeatures<TableTrade, String> param) {
+							return param.value.toProperty
+						}
+					}
+					val entryCol = new TableColumn("Entry")
+					entryCol.cellValueFactory = new Callback<CellDataFeatures<TableTrade, String>, ObservableValue<String>> {
+						override call(CellDataFeatures<TableTrade, String> param) {
+							return param.value.entryProperty
+						}
+					}
+					val exitCol = new TableColumn("Exit")
+					exitCol.cellValueFactory = new Callback<CellDataFeatures<TableTrade, String>, ObservableValue<String>> {
+						override call(CellDataFeatures<TableTrade, String> param) {
+							return param.value.exitProperty
+						}
+					}
+					val profitCol = new TableColumn("Profit")
+					profitCol.cellValueFactory = new Callback<CellDataFeatures<TableTrade, String>, ObservableValue<String>> {
+						override call(CellDataFeatures<TableTrade, String> param) {
+							return param.value.profitProperty
+						}
+					}
+
+					table.getColumns().addAll(nrCol, directionCol, fromCol, toCol, entryCol, exitCol, profitCol)
+					table.columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
+
+					val profitCalc = new AbsoluteProfitCriterion()					
+					tradingRecord.trades.forEach[trade,index|
+						table.items.add(new TableTrade() => [
+							nr = index+""
+							direction = if(trade.entry.buy) "LONG" else "SHORT"
+							from = backTest.series.getTick(trade.entry.index).endTime+""
+							to = backTest.series.getTick(trade.exit.index).endTime+""
+							entry = moneyFormat.format(trade.entry.price.toDouble)
+							exit = moneyFormat.format(trade.exit.price.toDouble)
+							profit = moneyFormat.format(profitCalc.calculate(backTest.series, trade))
+						])
+					]
+
+					val container = new AnchorPane(table) => [
+						minWidth = 0
+						minHeight = 0
+						AnchorPane.setBottomAnchor(table, 0D)
+						AnchorPane.setTopAnchor(table, 0D)
+						AnchorPane.setLeftAnchor(table, 0D)
+						AnchorPane.setRightAnchor(table, 0D)
+					]
+					content = container
+					tabs += it
+				]
 
 			]
 			new Thread(backTest).start()
 		]
+	}
+	
+	@FXBindable static class TableTrade {
+		
+		String nr
+		String direction
+		String from
+		String to
+		String entry
+		String exit
+		String profit
+		
 	}
 
 }
