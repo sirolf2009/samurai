@@ -1,9 +1,10 @@
 package com.sirolf2009.samurai.gui
 
-import com.sirolf2009.samurai.AbsoluteProfitCriterion
 import com.sirolf2009.samurai.Samurai
+import com.sirolf2009.samurai.criterion.AbsoluteProfitCriterion
 import com.sirolf2009.samurai.dataprovider.DataProvider
 import com.sirolf2009.samurai.gui.TabPaneBacktest.TableTrade
+import com.sirolf2009.samurai.indicator.IndicatorProfit
 import com.sirolf2009.samurai.renderer.chart.Chart
 import com.sirolf2009.samurai.renderer.chart.ChartData
 import com.sirolf2009.samurai.renderer.chart.ChartIndicator
@@ -12,11 +13,11 @@ import com.sirolf2009.samurai.strategy.IStrategy
 import com.sirolf2009.samurai.tasks.BackTest
 import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.TradingRecord
-import eu.verdelhan.ta4j.analysis.CashFlow
 import eu.verdelhan.ta4j.analysis.criteria.AverageProfitCriterion
 import eu.verdelhan.ta4j.analysis.criteria.AverageProfitableTradesCriterion
 import eu.verdelhan.ta4j.analysis.criteria.MaximumDrawdownCriterion
 import eu.verdelhan.ta4j.analysis.criteria.NumberOfTradesCriterion
+import java.text.DecimalFormat
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
@@ -43,7 +44,6 @@ import org.joda.time.Period
 import xtendfx.beans.FXBindable
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
-import java.text.DecimalFormat
 
 class TabPaneBacktest extends TabPane {
 	
@@ -72,7 +72,6 @@ class TabPaneBacktest extends TabPane {
 
 			backTest.onSucceeded = [ backtestResult |
 				val tradingRecord = backtestResult.source.value as TradingRecord
-				val cashFlow = new CashFlow(backTest.series, tradingRecord)
 
 				new Tab("Details") => [
 					val details = new GridPane()
@@ -144,7 +143,7 @@ class TabPaneBacktest extends TabPane {
 					content = container
 					tabs += it
 					Platform.runLater [
-						chart = new ChartIndicator(canvas, cashFlow, backtestResult.source.value as TradingRecord, new ChartData(backTest.series, backTest.strategy.indicators(backTest.series)))
+						chart = new ChartIndicator(canvas, new IndicatorProfit(backTest.series, tradingRecord), backtestResult.source.value as TradingRecord, new ChartData(backTest.series, backTest.strategy.indicators(backTest.series)))
 						val ChangeListener<? super Number> onResize = [
 							chart.draw()
 						]

@@ -1,4 +1,4 @@
-package com.sirolf2009.samurai
+package com.sirolf2009.samurai.criterion
 
 import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.Trade
