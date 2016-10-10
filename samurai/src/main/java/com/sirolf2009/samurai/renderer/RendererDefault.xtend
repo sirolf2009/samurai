@@ -11,6 +11,7 @@ import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
+import javafx.scene.text.Font
 
 class RendererDefault implements IRenderer {
 
@@ -99,7 +100,7 @@ class RendererDefault implements IRenderer {
 		val minPrice = candles.min[a, b|a.compareTo(b)]
 		val maxPrice = candles.max[a, b|a.compareTo(b)]
 		
-		val axis = NumberAxis.fromRange(minPrice, maxPrice, panelHeight)
+		val axis = NumberAxis.fromRange(minPrice, maxPrice, height)
 		val map = [
 			val valueToAxis = map(it, minPrice, maxPrice, axis.minValue, axis.maxValue)
 			val valueOnChart = map(valueToAxis, axis.minValue, axis.maxValue, 0, -panelHeight)
