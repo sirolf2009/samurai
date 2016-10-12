@@ -15,11 +15,14 @@ class StrategySMACrossover implements IStrategy {
 	var SMAIndicator shortSma
 	var SMAIndicator longSma
 	
+	@Param public var shortPeriod = 5
+	@Param public var longPeriod = 30
+	
 	override setup(TimeSeries series) {
 		val closePrice = new ClosePriceIndicator(series)
 
-        shortSma = new SMAIndicator(closePrice, 5)
-        longSma = new SMAIndicator(closePrice, 30)
+        shortSma = new SMAIndicator(closePrice, shortPeriod)
+        longSma = new SMAIndicator(closePrice, longPeriod)
 
         val buyingRule = new CrossedUpIndicatorRule(shortSma, longSma)
         val sellingRule = new CrossedDownIndicatorRule(shortSma, longSma)

@@ -12,18 +12,18 @@ import javafx.scene.layout.Pane
 import javafx.scene.layout.RowConstraints
 
 class GUIUtil {
-	
+
 	def static <T> void expandAllNodes(TreeView<T> tree) {
 		tree.root.expandAllNodes
 	}
-	
+
 	def static <T> void expandAllNodes(TreeItem<T> item) {
 		if(item != null && !item.isLeaf) {
 			item.expanded = true
 			item.children.forEach[expandAllNodes]
 		}
 	}
-	
+
 	/**
 	 * @author https://community.oracle.com/thread/2386973
 	 */
@@ -51,7 +51,7 @@ class GUIUtil {
 		// turn layout pixel snapping off on the grid so that grid lines will be an even width.
 		grid.setSnapToPixel(false)
 	}
-	
+
 	/**
 	 * @author https://community.oracle.com/thread/2386973
 	 */
@@ -65,5 +65,9 @@ class GUIUtil {
 		rowConstraint.setValignment(VPos.CENTER)
 		(0 .. rows).forEach[grid.getRowConstraints().add(it, rowConstraint)]
 	}
-	
+
+	def static Node getNodeByRowColumnIndex(GridPane gridPane, int row, int column) {
+		gridPane.children.findFirst[GridPane.getRowIndex(it) == row && GridPane.getColumnIndex(it) == column]
+	}
+
 }
