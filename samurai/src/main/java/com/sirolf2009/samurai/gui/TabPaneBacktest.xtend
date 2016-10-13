@@ -46,7 +46,7 @@ import xtendfx.beans.FXBindable
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
 
 class TabPaneBacktest extends TabPane {
-	
+
 	static val moneyFormat = new DecimalFormat("$###,###,###,##0.00")
 
 	var Chart chart
@@ -63,6 +63,8 @@ class TabPaneBacktest extends TabPane {
 		]
 
 		new Thread(provider).start()
+
+		provider.onFailed = showErrorDialog
 
 		provider.onSucceeded = [
 			val backTest = new BackTest(samurai, strategy, it.source.value as TimeSeries)
@@ -201,13 +203,13 @@ class TabPaneBacktest extends TabPane {
 					table.getColumns().addAll(nrCol, directionCol, fromCol, toCol, entryCol, exitCol, profitCol)
 					table.columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
 
-					val profitCalc = new AbsoluteProfitCriterion()					
-					tradingRecord.trades.forEach[trade,index|
+					val profitCalc = new AbsoluteProfitCriterion()
+					tradingRecord.trades.forEach [ trade, index |
 						table.items.add(new TableTrade() => [
-							nr = index+""
+							nr = index + ""
 							direction = if(trade.entry.buy) "LONG" else "SHORT"
-							from = backTest.series.getTick(trade.entry.index).endTime+""
-							to = backTest.series.getTick(trade.exit.index).endTime+""
+							from = backTest.series.getTick(trade.entry.index).endTime + ""
+							to = backTest.series.getTick(trade.exit.index).endTime + ""
 							entry = moneyFormat.format(trade.entry.price.toDouble)
 							exit = moneyFormat.format(trade.exit.price.toDouble)
 							profit = moneyFormat.format(profitCalc.calculate(backTest.series, trade))
@@ -230,9 +232,9 @@ class TabPaneBacktest extends TabPane {
 			new Thread(backTest).start()
 		]
 	}
-	
+
 	@FXBindable static class TableTrade {
-		
+
 		String nr
 		String direction
 		String from
@@ -240,7 +242,7 @@ class TabPaneBacktest extends TabPane {
 		String entry
 		String exit
 		String profit
-		
+
 	}
 
 }

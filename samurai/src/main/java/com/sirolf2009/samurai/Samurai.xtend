@@ -2,6 +2,8 @@ package com.sirolf2009.samurai
 
 import com.sirolf2009.samurai.dataprovider.DataProvider
 import com.sirolf2009.samurai.dataprovider.DataProviderBitcoinCharts
+import com.sirolf2009.samurai.dataprovider.DataProviderCachedBitcoinCharts
+import com.sirolf2009.samurai.gui.NumberField
 import com.sirolf2009.samurai.gui.NumberSpinner
 import com.sirolf2009.samurai.gui.TabPaneBacktest
 import com.sirolf2009.samurai.gui.TreeItemDataProvider
@@ -46,7 +48,6 @@ import xtendfx.FXApp
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
 import static extension xtendfx.scene.SceneBuilder.*
-import com.sirolf2009.samurai.gui.NumberField
 
 @FXApp @Accessors class Samurai {
 
@@ -113,6 +114,11 @@ import com.sirolf2009.samurai.gui.NumberField
 								children += new TreeItemDataProvider("BTCUSD - OkCoin", new DataProviderBitcoinCharts("data/bitfinexUSD.csv"))
 								children += new TreeItemDataProvider("BTCUSD - Bitstamp", new DataProviderBitcoinCharts("data/bitstampUSD.csv"))
 							]
+							children += new TreeItem("BitcoinCharts Cached") => [
+								children += new TreeItemDataProvider("BTCCNY - OkCoin", new DataProviderCachedBitcoinCharts("data/okcoinCNY.csv"))
+								children += new TreeItemDataProvider("BTCUSD - OkCoin", new DataProviderCachedBitcoinCharts("data/bitfinexUSD.csv"))
+								children += new TreeItemDataProvider("BTCUSD - Bitstamp", new DataProviderCachedBitcoinCharts("data/bitstampUSD.csv"))
+							]
 						]
 						showRoot = false
 						selectionModel.selectedItemProperty.addListener [
@@ -172,8 +178,8 @@ import com.sirolf2009.samurai.gui.NumberField
 			)
 		]
 		title = "Samurai"
-		width = 800
-		height = 600
+		width = 1366
+		height = 768
 		icons += new Image(new FileInputStream("src/main/resources/icon.png"))
 		show
 	}
