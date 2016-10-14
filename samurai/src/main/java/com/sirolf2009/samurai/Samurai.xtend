@@ -116,11 +116,14 @@ import java.lang.Thread.UncaughtExceptionHandler
 						]
 						showRoot = false
 						selectionModel.selectedItemProperty.addListener [
-							provider = (it as ReadOnlyObjectProperty<TreeItem<String>>).value as TreeItemDataProvider
-							dataPane.graphic = new ImageView(new Image(new FileInputStream("src/main/resources/ok.png")))
-							dataPane.expanded = false
-							strategyPane.expanded = true
-							parametersPane.expanded = false
+							val item = (it as ReadOnlyObjectProperty<TreeItem<String>>).value
+							if(item instanceof TreeItemDataProvider) {
+								provider = item as TreeItemDataProvider
+								dataPane.graphic = new ImageView(new Image(new FileInputStream("src/main/resources/ok.png")))
+								dataPane.expanded = false
+								strategyPane.expanded = true
+								parametersPane.expanded = false
+							}
 						]
 						expandAllNodes
 					]
@@ -135,20 +138,23 @@ import java.lang.Thread.UncaughtExceptionHandler
 						]
 						showRoot = false
 						selectionModel.selectedItemProperty.addListener [
-							strategy = ((it as ReadOnlyObjectProperty<TreeItem<String>>).value as TreeItemStrategy).strategy
-							strategyPane.graphic = new ImageView(new Image(new FileInputStream("src/main/resources/ok.png")))
-							dataPane.expanded = false
-							strategyPane.expanded = false
-							parametersPane.expanded = true
+							val item = (it as ReadOnlyObjectProperty<TreeItem<String>>).value
+							if(item instanceof TreeItemStrategy) {
+								strategy = item.strategy
+								strategyPane.graphic = new ImageView(new Image(new FileInputStream("src/main/resources/ok.png")))
+								dataPane.expanded = false
+								strategyPane.expanded = false
+								parametersPane.expanded = true
 
-							strategy.class.fields.filter [
-								annotations.findFirst[it.annotationType == Param] != null
-							].forEach [ field, index |
-								parametersGrid.add(new Label(field.name), 0, index)
-								if(field.type == Integer || field.type == Integer.TYPE) {
-									parametersGrid.add(new NumberSpinner(field.get(strategy) as Integer, 1), 1, index)
-								}
-							]
+								strategy.class.fields.filter [
+									annotations.findFirst[it.annotationType == Param] != null
+								].forEach [ field, index |
+									parametersGrid.add(new Label(field.name), 0, index)
+									if(field.type == Integer || field.type == Integer.TYPE) {
+										parametersGrid.add(new NumberSpinner(field.get(strategy) as Integer, 1), 1, index)
+									}
+								]
+							}
 						]
 						expandAllNodes
 					]
@@ -176,8 +182,8 @@ import java.lang.Thread.UncaughtExceptionHandler
 		height = 768
 		icons += new Image(new FileInputStream("src/main/resources/icon.png"))
 		show
-		
-		Thread.defaultUncaughtExceptionHandler = [t,e|
+
+		Thread.defaultUncaughtExceptionHandler = [ t, e |
 			e.showErrorDialog()
 		]
 	}
