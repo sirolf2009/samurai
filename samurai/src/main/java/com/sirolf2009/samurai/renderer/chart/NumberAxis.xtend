@@ -14,7 +14,7 @@ import org.eclipse.xtend.lib.annotations.Data
 	boolean isVertical
 
 	def static NumberAxis fromRange(double minValueUgly, double maxValue, double length) {
-		val minValue = minValueUgly.pretty
+		val minValue = minValueUgly.pretty()
 		val range = (maxValue - minValue)
 		
 		if(range == 0) {
@@ -52,8 +52,9 @@ import org.eclipse.xtend.lib.annotations.Data
 	}
 	
 	def static pretty(double value) {
-    	val log = Math.floor(Math.log10(value))
-
+		if(value == 0) return 0
+    	val log = Math.floor(Math.log10(Math.abs(value)))
+    	
     	val fraction = if(log > 1) {
         	4
     	} else {
