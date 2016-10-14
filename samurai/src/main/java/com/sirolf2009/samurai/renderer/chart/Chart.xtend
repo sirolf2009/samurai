@@ -4,6 +4,7 @@ import javafx.scene.canvas.Canvas
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import org.eclipse.xtend.lib.annotations.Accessors
+import com.sirolf2009.samurai.renderer.RendererDefault
 
 @Accessors abstract class Chart {
 	
@@ -32,6 +33,14 @@ import org.eclipse.xtend.lib.annotations.Accessors
 	}
 	
 	def void draw()
+	def int size()
+	
+	def void fitAll() {
+		val width = canvas.width-(RendererDefault.AXIS_SIZE+RendererDefault.AXIS_OFFSET)
+		val count = size()
+		zoomX = width/count/RendererDefault.WIDTH_TICK
+		draw()
+	}
 	
 	static class DragDetector {
 		

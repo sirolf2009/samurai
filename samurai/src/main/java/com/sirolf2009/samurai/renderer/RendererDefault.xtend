@@ -14,12 +14,12 @@ import javafx.scene.text.Text
 
 class RendererDefault implements IRenderer {
 
-	static val WIDTH_CANDLESTICK = 9
-	static val WIDTH_WICK = 1
-	static val SPACING = 2
-	static val WIDTH_TICK = WIDTH_CANDLESTICK + SPACING
-	static val AXIS_SIZE = 48
-	static val AXIS_OFFSET = 16
+	public static val WIDTH_CANDLESTICK = 9
+	public static val WIDTH_WICK = 1
+	public static val SPACING = 2
+	public static val WIDTH_TICK = WIDTH_CANDLESTICK + SPACING
+	public static val AXIS_SIZE = 48
+	public static val AXIS_OFFSET = 16
 
 	override drawChart(ChartData chart, Canvas canvas, GraphicsContext g, int x, double scaleX) {
 		val panels = 2 + chart.indicators.size //price chart counts as 2, because it should be twice as big

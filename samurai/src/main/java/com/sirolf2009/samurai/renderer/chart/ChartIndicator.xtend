@@ -31,5 +31,9 @@ class ChartIndicator extends Chart {
 
 		g.restore()
 	}
+	
+	override size() {
+		return indicator.timeSeries.tickCount
+	}
 
 }

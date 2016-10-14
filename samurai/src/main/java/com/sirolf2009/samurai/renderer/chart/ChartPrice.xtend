@@ -34,4 +34,8 @@ class ChartPrice extends Chart {
 		}
 	}
 	
+	override size() {
+		return series.tickCount
+	}
+	
 }

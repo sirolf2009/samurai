@@ -148,6 +148,7 @@ class TabPaneBacktest extends TabPane {
 					tabs += it
 					Platform.runLater [
 						chart = new ChartIndicator(canvas, new IndicatorProfit(backTest.series, tradingRecord), backtestResult.source.value as TradingRecord, new ChartData(backTest.series, backTest.strategy.indicators(backTest.series)))
+						chart.fitAll()
 						val ChangeListener<? super Number> onResize = [
 							chart.draw()
 						]
