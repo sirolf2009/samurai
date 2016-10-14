@@ -1,8 +1,6 @@
 package com.sirolf2009.samurai
 
-import com.sirolf2009.samurai.dataprovider.DataProvider
 import com.sirolf2009.samurai.dataprovider.DataProviderBitcoinCharts
-import com.sirolf2009.samurai.dataprovider.DataProviderCachedBitcoinCharts
 import com.sirolf2009.samurai.gui.NumberField
 import com.sirolf2009.samurai.gui.NumberSpinner
 import com.sirolf2009.samurai.gui.TabPaneBacktest
@@ -48,6 +46,7 @@ import xtendfx.FXApp
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
 import static extension xtendfx.scene.SceneBuilder.*
+import java.lang.Thread.UncaughtExceptionHandler
 
 @FXApp @Accessors class Samurai {
 
@@ -59,7 +58,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 	var BackTest backTest
 	var Chart chart
 
-	var DataProvider provider
+	var TreeItemDataProvider provider
 	var IStrategy strategy
 
 	override void start(Stage it) {
@@ -101,7 +100,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 							set(strategy, value)
 						}
 					]
-					backtests.tabs += new Tab(strategy.class.simpleName, new TabPaneBacktest(this, provider, strategy))
+					backtests.tabs += new Tab(strategy.class.simpleName, new TabPaneBacktest(this, provider.provider.get(), strategy))
 				]
 			]
 
@@ -110,19 +109,14 @@ import static extension xtendfx.scene.SceneBuilder.*
 					content = new TreeView => [
 						root = new TreeItem("") => [
 							children += new TreeItem("BitcoinCharts") => [
-								children += new TreeItemDataProvider("BTCCNY - OkCoin", new DataProviderBitcoinCharts("data/okcoinCNY.csv"))
-								children += new TreeItemDataProvider("BTCUSD - OkCoin", new DataProviderBitcoinCharts("data/bitfinexUSD.csv"))
-								children += new TreeItemDataProvider("BTCUSD - Bitstamp", new DataProviderBitcoinCharts("data/bitstampUSD.csv"))
-							]
-							children += new TreeItem("BitcoinCharts Cached") => [
-								children += new TreeItemDataProvider("BTCCNY - OkCoin", new DataProviderCachedBitcoinCharts("data/okcoinCNY.csv"))
-								children += new TreeItemDataProvider("BTCUSD - OkCoin", new DataProviderCachedBitcoinCharts("data/bitfinexUSD.csv"))
-								children += new TreeItemDataProvider("BTCUSD - Bitstamp", new DataProviderCachedBitcoinCharts("data/bitstampUSD.csv"))
+								children += new TreeItemDataProvider("BTCCNY - OkCoin", [new DataProviderBitcoinCharts("data/okcoinCNY.csv")])
+								children += new TreeItemDataProvider("BTCUSD - OkCoin", [new DataProviderBitcoinCharts("data/bitfinexUSD.csv")])
+								children += new TreeItemDataProvider("BTCUSD - Bitstamp", [new DataProviderBitcoinCharts("data/bitstampUSD.csv")])
 							]
 						]
 						showRoot = false
 						selectionModel.selectedItemProperty.addListener [
-							provider = ((it as ReadOnlyObjectProperty<TreeItem<String>>).value as TreeItemDataProvider).provider
+							provider = (it as ReadOnlyObjectProperty<TreeItem<String>>).value as TreeItemDataProvider
 							dataPane.graphic = new ImageView(new Image(new FileInputStream("src/main/resources/ok.png")))
 							dataPane.expanded = false
 							strategyPane.expanded = true
@@ -182,6 +176,10 @@ import static extension xtendfx.scene.SceneBuilder.*
 		height = 768
 		icons += new Image(new FileInputStream("src/main/resources/icon.png"))
 		show
+		
+		Thread.defaultUncaughtExceptionHandler = [t,e|
+			e.showErrorDialog()
+		]
 	}
 
 }

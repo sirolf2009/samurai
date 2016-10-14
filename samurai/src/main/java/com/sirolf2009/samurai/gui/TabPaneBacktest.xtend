@@ -72,6 +72,8 @@ class TabPaneBacktest extends TabPane {
 			samurai.progressMessage.textProperty.bind(backTest.messageProperty)
 			samurai.progressIndicator.progressProperty.bind(backTest.progressProperty)
 
+			backTest.onFailed = showErrorDialog
+
 			backTest.onSucceeded = [ backtestResult |
 				val tradingRecord = backtestResult.source.value as TradingRecord
 

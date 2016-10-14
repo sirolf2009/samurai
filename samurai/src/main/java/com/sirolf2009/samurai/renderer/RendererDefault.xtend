@@ -46,8 +46,8 @@ class RendererDefault implements IRenderer {
 		val panelHeight = height - AXIS_OFFSET
 		
 		val widthCandleRendered = WIDTH_TICK * scaleX
-		val startCandle = Math.floor(x / widthCandleRendered) as int
-		val endCandle = Math.min(series.tickCount-1, startCandle + Math.floor(panelWidth / widthCandleRendered) as int)
+		val startCandle = Math.max(0, Math.floor(x / widthCandleRendered)) as int
+		val endCandle = Math.max(0, Math.min(series.tickCount-1, startCandle + Math.floor(panelWidth / widthCandleRendered) as int))
 		val candles = (startCandle .. endCandle).map[series.getTick(it)].toList()
 		val minPrice = candles.min[a, b|a.minPrice.compareTo(b.minPrice)].minPrice.toDouble
 		val maxPrice = candles.max[a, b|a.maxPrice.compareTo(b.maxPrice)].maxPrice.toDouble
@@ -93,8 +93,8 @@ class RendererDefault implements IRenderer {
 		val panelHeight = height - AXIS_OFFSET
 		
 		val widthCandleRendered = WIDTH_TICK * scaleX
-		val startCandle = Math.floor(x / widthCandleRendered) as int
-		val endCandle = Math.min(indicator.timeSeries.tickCount-1, startCandle + Math.floor(panelWidth / widthCandleRendered) as int)
+		val startCandle = Math.max(0, Math.floor(x / widthCandleRendered)) as int
+		val endCandle = Math.max(0, Math.min(indicator.timeSeries.tickCount-1, startCandle + Math.floor(panelWidth / widthCandleRendered) as int))
 		val candles = (startCandle .. endCandle).map[(indicator.getValue(it) as Decimal).toDouble].toList()
 		val minPrice = candles.min[a, b|a.compareTo(b)]
 		val maxPrice = candles.max[a, b|a.compareTo(b)]

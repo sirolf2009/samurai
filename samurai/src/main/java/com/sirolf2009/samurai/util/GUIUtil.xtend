@@ -9,6 +9,7 @@ import javafx.geometry.VPos
 import javafx.scene.Node
 import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType
+import javafx.scene.control.ButtonType
 import javafx.scene.control.Control
 import javafx.scene.control.Label
 import javafx.scene.control.TextArea
@@ -18,14 +19,8 @@ import javafx.scene.layout.ColumnConstraints
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
-import javafx.scene.layout.RowConstraints
-import javafx.scene.control.ButtonType
-import javafx.scene.control.ButtonBar.ButtonData
-import javafx.stage.Stage
-import javafx.scene.image.Image
-import java.io.FileInputStream
-import java.io.InputStream
 import javafx.scene.layout.Region
+import javafx.scene.layout.RowConstraints
 
 class GUIUtil {
 
@@ -85,55 +80,56 @@ class GUIUtil {
 	def static Node getNodeByRowColumnIndex(GridPane gridPane, int row, int column) {
 		gridPane.children.findFirst[GridPane.getRowIndex(it) == row && GridPane.getColumnIndex(it) == column]
 	}
+	
+	public static val showErrorDialog = new EventHandler<WorkerStateEvent> {
+
+		override handle(WorkerStateEvent event) {
+			event.source.exception.showErrorDialog
+		}
+	}
 
 	/**
 	 * @author http://code.makery.ch/blog/javafx-dialogs-official/
 	 */
-	public static val showErrorDialog = new EventHandler<WorkerStateEvent> {
+	def static void showErrorDialog(Throwable ex) {
+		val alert = new Alert(AlertType.ERROR)
+		alert.setTitle("Exception Dialog")
+		alert.setHeaderText("You've hit a bug. I'm sorry :(")
+		alert.setContentText(ex.class.simpleName+": "+ex.localizedMessage)
 
-		override handle(WorkerStateEvent event) {
-			val ex = event.source.exception
-			
-			val alert = new Alert(AlertType.ERROR)
-			alert.setTitle("Exception Dialog")
-			alert.setHeaderText("You've hit a bug. I'm sorry :(")
-			alert.setContentText(ex.localizedMessage)
+		val sw = new StringWriter()
+		val pw = new PrintWriter(sw)
+		ex.printStackTrace(pw)
+		val exceptionText = sw.toString()
 
-			val sw = new StringWriter()
-			val pw = new PrintWriter(sw)
-			ex.printStackTrace(pw)
-			val exceptionText = sw.toString()
+		val label = new Label("The exception stacktrace was:")
 
-			val label = new Label("The exception stacktrace was:")
+		val textArea = new TextArea(exceptionText)
+		textArea.setEditable(false)
+		textArea.setWrapText(true)
 
-			val textArea = new TextArea(exceptionText)
-			textArea.setEditable(false)
-			textArea.setWrapText(true)
+		textArea.setMaxWidth(Double.MAX_VALUE)
+		textArea.setMaxHeight(Double.MAX_VALUE)
+		GridPane.setVgrow(textArea, Priority.ALWAYS)
+		GridPane.setHgrow(textArea, Priority.ALWAYS)
 
-			textArea.setMaxWidth(Double.MAX_VALUE)
-			textArea.setMaxHeight(Double.MAX_VALUE)
-			GridPane.setVgrow(textArea, Priority.ALWAYS)
-			GridPane.setHgrow(textArea, Priority.ALWAYS)
+		val expContent = new GridPane()
+		expContent.setMaxWidth(Double.MAX_VALUE)
+		expContent.add(label, 0, 0)
+		expContent.add(textArea, 0, 1)
 
-			val expContent = new GridPane()
-			expContent.setMaxWidth(Double.MAX_VALUE)
-			expContent.add(label, 0, 0)
-			expContent.add(textArea, 0, 1)
+		alert.dialogPane.expandableContent = expContent
 
-			alert.dialogPane.expandableContent = expContent
-			
-			val report = new ButtonType("Report")
-			alert.buttonTypes += report
-			
-			alert.dialogPane.children.filter[it instanceof Label].forEach[(it as Label).setMinHeight(Region.USE_PREF_SIZE)]
-			ex.printStackTrace()
-			val result = alert.showAndWait()
-			if(result == report) {
-				//TODO send email
-				println("//TODO send email")
-			}
+		val report = new ButtonType("Report")
+		alert.buttonTypes += report
+
+		alert.dialogPane.children.filter[it instanceof Label].forEach[(it as Label).setMinHeight(Region.USE_PREF_SIZE)]
+		ex.printStackTrace()
+		val result = alert.showAndWait()
+		if(result == report) {
+			// TODO send email
+			println("//TODO send email")
 		}
-
 	}
 
 }
