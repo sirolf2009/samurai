@@ -16,6 +16,11 @@ import org.eclipse.xtend.lib.annotations.Data
 	def static NumberAxis fromRange(double minValueUgly, double maxValue, double length) {
 		val minValue = minValueUgly.pretty
 		val range = (maxValue - minValue)
+		
+		if(range == 0) {
+			return new NumberAxis(#[], 0, minValueUgly, maxValue, true)
+		}
+		
 		val exponent = Math.log10(range)
 		val unroundedTickSize = range / (((length / 32) as int) - 1)
 		val x = Math.ceil(Math.log10(unroundedTickSize) - 1)
