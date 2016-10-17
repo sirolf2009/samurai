@@ -47,6 +47,7 @@ import xtendfx.FXApp
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
 import static extension xtendfx.scene.SceneBuilder.*
 import java.lang.Thread.UncaughtExceptionHandler
+import com.sirolf2009.samurai.strategy.StrategyMovingMomentum
 
 @FXApp @Accessors class Samurai {
 
@@ -134,6 +135,7 @@ import java.lang.Thread.UncaughtExceptionHandler
 						root = new TreeItem("Strategy") => [
 							children += new TreeItem("Built-In") => [
 								children += new TreeItemStrategy("SMA Crossover", new StrategySMACrossover())
+								children += new TreeItemStrategy("Moving Momentum", new StrategyMovingMomentum())
 							]
 						]
 						showRoot = false

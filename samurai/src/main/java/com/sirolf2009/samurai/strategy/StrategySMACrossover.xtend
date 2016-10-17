@@ -29,7 +29,7 @@ class StrategySMACrossover implements IStrategy {
                 .or(new StopLossRule(closePrice, Decimal.valueOf("3")))
                 .or(new StopGainRule(closePrice, Decimal.valueOf("2")))
         
-        return new Strategy(buyingRule, sellingRule);
+        return new Strategy(buyingRule, sellingRule)
 	}
 	
 	override indicators(TimeSeries series) {

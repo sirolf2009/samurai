@@ -8,6 +8,9 @@ import eu.verdelhan.ta4j.analysis.criteria.AbstractAnalysisCriterion
 class AbsoluteProfitCriterion extends AbstractAnalysisCriterion {
 	
 	override calculate(TimeSeries series, TradingRecord tradingRecord) {
+		if(tradingRecord.trades.size == 0) {
+			return 0
+		}
         return tradingRecord.trades.map[calculateProfit(series, it)].reduce[a,b|a+b]
 	}
 	
