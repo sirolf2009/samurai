@@ -14,6 +14,10 @@ import org.eclipse.xtend.lib.annotations.Data
 	boolean isVertical
 
 	def static NumberAxis fromRange(double minValueUgly, double maxValue, double length) {
+		return fromRange(minValueUgly, maxValue, length, 32)
+	}
+
+	def static NumberAxis fromRange(double minValueUgly, double maxValue, double length, double labels) {
 		val minValue = minValueUgly.pretty()
 		val range = (maxValue - minValue)
 		
@@ -22,7 +26,7 @@ import org.eclipse.xtend.lib.annotations.Data
 		}
 		
 		val exponent = Math.log10(range)
-		val unroundedTickSize = range / (((length / 32) as int) - 1)
+		val unroundedTickSize = range / (((length / labels) as int) - 1)
 		val x = Math.ceil(Math.log10(unroundedTickSize) - 1)
 		val pow10x = Math.pow(10, x)
 		val roundedTickRange = Math.ceil(unroundedTickSize / pow10x) * pow10x

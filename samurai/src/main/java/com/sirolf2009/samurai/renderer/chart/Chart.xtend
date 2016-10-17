@@ -36,7 +36,7 @@ import com.sirolf2009.samurai.renderer.RendererDefault
 	def int size()
 	
 	def void fitAll() {
-		val width = canvas.width-(RendererDefault.AXIS_SIZE+RendererDefault.AXIS_OFFSET)
+		val width = canvas.width-(RendererDefault.Y_AXIS_SIZE+RendererDefault.AXIS_OFFSET)
 		val count = size()
 		zoomX = width/count/RendererDefault.WIDTH_TICK
 		draw()

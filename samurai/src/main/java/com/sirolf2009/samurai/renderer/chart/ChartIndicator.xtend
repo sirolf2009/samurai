@@ -27,7 +27,7 @@ class ChartIndicator extends Chart {
 		g.fill = Color.BLACK.brighter
 		g.fillRect(0, 0, canvas.width, canvas.height)
 
-		renderer.drawLineIndicator(indicator, g, canvas.width, canvas.height, scrollX, zoomX)
+		renderer.drawLineIndicatorChart(indicator, g, canvas.width, canvas.height, scrollX, zoomX)
 
 		g.restore()
 	}
