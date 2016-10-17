@@ -9,5 +9,6 @@ import java.util.List
 	
 	TimeSeries timeseries
 	List<Indicator<?>> indicators
+	List<Pair<Integer, Marker>> markers
 	
 }

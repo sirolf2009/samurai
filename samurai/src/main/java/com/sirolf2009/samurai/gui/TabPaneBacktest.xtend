@@ -44,6 +44,9 @@ import org.joda.time.Period
 import xtendfx.beans.FXBindable
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
+import com.sirolf2009.samurai.renderer.chart.Marker
+import com.sirolf2009.samurai.renderer.chart.Renderables
+import java.util.ArrayList
 
 class TabPaneBacktest extends TabPane {
 
@@ -123,8 +126,11 @@ class TabPaneBacktest extends TabPane {
 					AnchorPane.setRightAnchor(canvas, 0D)
 					content = container
 					tabs += it
+					val buys = tradingRecord.trades.map[0 -> new Marker(it.entry.index, it.entry.price.toDouble, [g,tick| Renderables.arrowUp.render(g, tick)])]
+					val sells = tradingRecord.trades.map[0 -> new Marker(it.exit.index, it.exit.price.toDouble, [g,tick| Renderables.arrowDown.render(g, tick)])]
+					val markers = buys + sells
 					Platform.runLater [
-						chart = new ChartPrice(canvas, backTest.series, tradingRecord, new ChartData(backTest.series, backTest.strategy.indicators(backTest.series)))
+						chart = new ChartPrice(canvas, backTest.series, tradingRecord, new ChartData(backTest.series, backTest.strategy.indicators(backTest.series), markers.toList()))
 						val ChangeListener<? super Number> onResize = [
 							chart.draw()
 						]
@@ -147,7 +153,7 @@ class TabPaneBacktest extends TabPane {
 					content = container
 					tabs += it
 					Platform.runLater [
-						chart = new ChartIndicator(canvas, new IndicatorProfit(backTest.series, tradingRecord), backtestResult.source.value as TradingRecord, new ChartData(backTest.series, backTest.strategy.indicators(backTest.series)))
+						chart = new ChartIndicator(canvas, new IndicatorProfit(backTest.series, tradingRecord), backtestResult.source.value as TradingRecord, new ChartData(backTest.series, backTest.strategy.indicators(backTest.series), new ArrayList()))
 						chart.fitAll()
 						val ChangeListener<? super Number> onResize = [
 							chart.draw()
