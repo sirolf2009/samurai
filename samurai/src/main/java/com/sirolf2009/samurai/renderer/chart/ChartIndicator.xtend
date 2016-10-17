@@ -5,16 +5,17 @@ import eu.verdelhan.ta4j.Indicator
 import eu.verdelhan.ta4j.TradingRecord
 import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
+import eu.verdelhan.ta4j.Decimal
 
 class ChartIndicator extends Chart {
 
 	static val renderer = new RendererDefault()
 
-	val Indicator<?> indicator
+	val Indicator<Decimal> indicator
 	val TradingRecord tradingRecord
 	val ChartData data
 
-	new(Canvas canvas, Indicator<?> indicator, TradingRecord tradingRecord, ChartData data) {
+	new(Canvas canvas, Indicator<Decimal> indicator, TradingRecord tradingRecord, ChartData data) {
 		super(canvas)
 		this.indicator = indicator
 		this.tradingRecord = tradingRecord

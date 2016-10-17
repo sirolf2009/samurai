@@ -1,6 +1,7 @@
 package com.sirolf2009.samurai.strategy
 
 import eu.verdelhan.ta4j.Decimal
+import eu.verdelhan.ta4j.Indicator
 import eu.verdelhan.ta4j.Strategy
 import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.indicators.oscillators.StochasticOscillatorKIndicator
@@ -14,11 +15,11 @@ import eu.verdelhan.ta4j.trading.rules.UnderIndicatorRule
 
 class StrategyMovingMomentum implements IStrategy {
 	
-	var EMAIndicator shortEma
-	var EMAIndicator longEma
-	var StochasticOscillatorKIndicator stochasticOscillK
-	var MACDIndicator macd
-	var EMAIndicator emaMacd
+	var Indicator<Decimal> shortEma
+	var Indicator<Decimal> longEma
+	var Indicator<Decimal> stochasticOscillK
+	var Indicator<Decimal> macd
+	var Indicator<Decimal> emaMacd
 	
 	@Param public var shortPeriod = 9
 	@Param public var longPeriod = 26
@@ -50,7 +51,11 @@ class StrategyMovingMomentum implements IStrategy {
 	}
 	
 	override indicators(TimeSeries series) {
-        return #[shortEma, longEma, stochasticOscillK, macd, emaMacd]
+        return #[
+        	0 -> #[shortEma, longEma],
+        	1 -> #[stochasticOscillK],
+        	2 -> #[macd, emaMacd]
+        ]
 	}
 	
 }

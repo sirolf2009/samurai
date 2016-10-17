@@ -9,11 +9,12 @@ import eu.verdelhan.ta4j.trading.rules.CrossedDownIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.CrossedUpIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.StopGainRule
 import eu.verdelhan.ta4j.trading.rules.StopLossRule
+import eu.verdelhan.ta4j.Indicator
 
 class StrategySMACrossover implements IStrategy {
 	
-	var SMAIndicator shortSma
-	var SMAIndicator longSma
+	var Indicator<Decimal> shortSma
+	var Indicator<Decimal> longSma
 	
 	@Param public var shortPeriod = 5
 	@Param public var longPeriod = 30
@@ -33,7 +34,9 @@ class StrategySMACrossover implements IStrategy {
 	}
 	
 	override indicators(TimeSeries series) {
-        return #[shortSma, longSma]
+        return #[
+        	0 -> #[shortSma, longSma]
+        ]
 	}
 	
 }

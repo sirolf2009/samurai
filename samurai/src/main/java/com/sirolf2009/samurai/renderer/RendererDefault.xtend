@@ -15,6 +15,8 @@ import com.sirolf2009.samurai.renderer.chart.DateAxis
 import javafx.geometry.VPos
 import javafx.scene.text.TextAlignment
 import com.sirolf2009.samurai.renderer.chart.Marker
+import java.util.ArrayList
+import static extension com.sirolf2009.samurai.renderer.chart.ChartData.*
 
 class RendererDefault implements IRenderer {
 
@@ -27,67 +29,79 @@ class RendererDefault implements IRenderer {
 	public static val AXIS_OFFSET = 16
 
 	override drawChart(ChartData chart, Canvas canvas, GraphicsContext g, int x, double scaleX) {
-		val panels = 2 + chart.indicators.size // price chart counts as 2, because it should be twice as big
+		val panels = 2 + chart.indicators.map[key].max // price chart counts as 2, because it should be twice as big
 		val heightPerPanel = (canvas.height - X_AXIS_SIZE - AXIS_OFFSET) / panels
-
-		drawTimeseries(chart.timeseries, chart.markers.filter[key == 0].map[value].toList(), g, canvas.width, heightPerPanel * 2, x, scaleX)
-		g.translate(0, heightPerPanel * 2)
-		chart.indicators.forEach [ indicator, index |
-			g.stroke = Color.WHITE
-			g.lineWidth = 2
-			g.strokeLine(0, 0, canvas.width, 0)
-
-			drawLineIndicator(indicator, chart.markers.filter[key == index+1].map[value].toList(), g, canvas.width, heightPerPanel, x, scaleX)
-			g.translate(0, heightPerPanel)
-		]
 
 		val panelWidth = canvas.width - Y_AXIS_SIZE - AXIS_OFFSET
 		val widthCandleRendered = WIDTH_TICK * scaleX
 		val startCandle = Math.max(0, Math.floor(x / widthCandleRendered)) as int
 		val endCandle = Math.max(0, Math.min(chart.timeseries.tickCount - 1, startCandle + Math.floor(panelWidth / widthCandleRendered) as int))
+		{
+			val panelHeight = heightPerPanel * 2 - AXIS_OFFSET
+			val minPrice = Math.min(chart.min(startCandle, endCandle), chart.min(0, startCandle, endCandle))
+			val maxPrice = Math.max(chart.max(startCandle, endCandle), chart.max(0, startCandle, endCandle))
+			val axis = NumberAxis.fromRange(minPrice, maxPrice, panelHeight)
+
+			drawTimeseries(axis, chart.timeseries, chart.markers.filter[key == 0].map[value].toList(), g, canvas.width, heightPerPanel * 2, x, scaleX, startCandle, endCandle)
+			chart.indicatorsInPanel(0).forEach [
+				drawLineIndicator(axis, it, new ArrayList(), g, canvas.width, heightPerPanel * 2, x, scaleX, startCandle, endCandle)
+			]
+			g.translate(0, heightPerPanel * 2)
+		}
+		if(panels > 2) {
+			(1 .. panels - 2).forEach [ panel |
+				g.stroke = Color.WHITE
+				g.lineWidth = 2
+				g.strokeLine(0, 0, canvas.width, 0)
+
+				val panelHeight = heightPerPanel - AXIS_OFFSET
+				val minPrice = chart.indicatorsInPanel(panel).min(startCandle, endCandle)
+				val maxPrice = chart.indicatorsInPanel(panel).max(startCandle, endCandle)
+				val axis = NumberAxis.fromRange(minPrice, maxPrice, panelHeight)
+				chart.indicatorsInPanel(panel).forEach [
+					drawLineIndicator(axis, it, new ArrayList(), g, canvas.width, heightPerPanel, x, scaleX, startCandle, endCandle)
+				]
+				g.translate(0, heightPerPanel)
+			]
+		}
 		val candles = (startCandle .. endCandle).map[chart.timeseries.getTick(it)].toList()
 		drawXAxis(canvas.width, g, candles)
 	}
 
-	def drawTimeseries(TimeSeries series, List<Marker> markers, GraphicsContext g, double width, double height, int x, double scaleX) {
-		g.setLineWidth(1)
-		g.fill = Color.WHITE
-		g.fillText(series.name, Y_AXIS_SIZE + 2, g.font.size + 2)
-
+	def drawTimeseries(NumberAxis axis, TimeSeries series, List<Marker> markers, GraphicsContext g, double width, double height, int x, double scaleX) {
 		val panelWidth = width - Y_AXIS_SIZE - AXIS_OFFSET
-		val panelHeight = height - AXIS_OFFSET
 
 		val widthCandleRendered = WIDTH_TICK * scaleX
 		val startCandle = Math.max(0, Math.floor(x / widthCandleRendered)) as int
 		val endCandle = Math.max(0, Math.min(series.tickCount - 1, startCandle + Math.floor(panelWidth / widthCandleRendered) as int))
-		val candles = (startCandle .. endCandle).map[series.getTick(it)].toList()
-		val minPrice = candles.min[a, b|a.minPrice.compareTo(b.minPrice)].minPrice.toDouble
-		val maxPrice = candles.max[a, b|a.maxPrice.compareTo(b.maxPrice)].maxPrice.toDouble
 
-		val axis = NumberAxis.fromRange(minPrice, maxPrice, panelHeight)
-		val map = [
-			val valueToAxis = map(it, minPrice, maxPrice, axis.minValue, axis.maxValue)
-			val valueOnChart = map(valueToAxis, axis.minValue, axis.maxValue, 0, -panelHeight)
-			valueOnChart
-		]
+		drawTimeseries(axis, series, markers, g, width, height, x, scaleX, startCandle, endCandle)
+	}
+
+	def drawTimeseries(NumberAxis axis, TimeSeries series, List<Marker> markers, GraphicsContext g, double width, double height, int x, double scaleX, int startCandle, int endCandle) {
+		g.setLineWidth(1)
+		g.fill = Color.WHITE
+		g.fillText(series.name, Y_AXIS_SIZE + 2, g.font.size + 2)
+
+		val candles = (startCandle .. endCandle).map[series.getTick(it)].toList()
 
 		g.save()
 		g.translate(Y_AXIS_SIZE + (AXIS_OFFSET / 2), height - (AXIS_OFFSET / 2))
 		g.scale(scaleX, 1)
 
 		candles.forEach [ it, index |
-			val yWick = map.apply(it.maxPrice.toDouble)
-			val lengthWick = map.apply(it.minPrice.toDouble) - yWick
+			val yWick = axis.map(it.maxPrice.toDouble)
+			val lengthWick = axis.map(it.minPrice.toDouble) - yWick
 
 			val upper = it.openPrice.max(it.closePrice).toDouble
 			val lower = it.openPrice.min(it.closePrice).toDouble
-			val yBody = map.apply(upper)
-			val lengthBody = map.apply(lower) - yBody
+			val yBody = axis.map(upper)
+			val lengthBody = axis.map(lower) - yBody
 
 			drawCandlestick(g, bullish, yWick, lengthWick, yBody, lengthBody)
 			markers.filter[it.x == startCandle + index].forEach [ marker |
 				g.save()
-				g.translate(0, map.apply(closePrice.toDouble))
+				g.translate(0, axis.map(closePrice.toDouble))
 				marker.renderable.render(g, it)
 				g.restore()
 			]
@@ -96,7 +110,7 @@ class RendererDefault implements IRenderer {
 		]
 		g.restore()
 
-		drawYAxis(g, height, minPrice, maxPrice)
+		drawYAxis(g, height, axis.minValue, axis.maxValue)
 	}
 
 	def drawCandlestick(GraphicsContext g, boolean bullish, double yWick, double lengthWick, double yBody, double lengthBody) {
@@ -106,35 +120,34 @@ class RendererDefault implements IRenderer {
 		g.fillRect(-Math.floor(WIDTH_CANDLESTICK / 2), yBody, WIDTH_CANDLESTICK, lengthBody)
 	}
 
-	def drawLineIndicatorChart(Indicator<?> indicator, List<Marker> markers, GraphicsContext g, double width, double height, int x, double scaleX) {
-		drawLineIndicator(indicator, markers, g, width, height - X_AXIS_SIZE - AXIS_OFFSET, x, scaleX)
-		g.translate(0, height - X_AXIS_SIZE - AXIS_OFFSET)
+	def drawLineIndicatorChart(Indicator<Decimal> indicator, List<Marker> markers, GraphicsContext g, double width, double height, int x, double scaleX) {
 		val panelWidth = width - Y_AXIS_SIZE - AXIS_OFFSET
-
 		val widthCandleRendered = WIDTH_TICK * scaleX
 		val startCandle = Math.max(0, Math.floor(x / widthCandleRendered)) as int
 		val endCandle = Math.max(0, Math.min(indicator.timeSeries.tickCount - 1, startCandle + Math.floor(panelWidth / widthCandleRendered) as int))
+
+		val minPrice = indicator.min(startCandle, endCandle)
+		val maxPrice = indicator.max(startCandle, endCandle)
+		val axis = NumberAxis.fromRange(minPrice, maxPrice, height - X_AXIS_SIZE - AXIS_OFFSET)
+
+		drawLineIndicator(axis, indicator, markers, g, panelWidth, height - X_AXIS_SIZE - AXIS_OFFSET, x, scaleX)
+		g.translate(0, height - X_AXIS_SIZE - AXIS_OFFSET)
+
 		val candles = (startCandle .. endCandle).map[indicator.timeSeries.getTick(it)].toList()
 		drawXAxis(width, g, candles)
 	}
 
-	def drawLineIndicator(Indicator<?> indicator, List<Marker> markers, GraphicsContext g, double width, double height, int x, double scaleX) {
+	def drawLineIndicator(NumberAxis axis, Indicator<?> indicator, List<Marker> markers, GraphicsContext g, double width, double height, int x, double scaleX) {
 		val panelWidth = width - Y_AXIS_SIZE - AXIS_OFFSET
-		val panelHeight = height - AXIS_OFFSET
-
 		val widthCandleRendered = WIDTH_TICK * scaleX
 		val startCandle = Math.max(0, Math.floor(x / widthCandleRendered)) as int
 		val endCandle = Math.max(0, Math.min(indicator.timeSeries.tickCount - 1, startCandle + Math.floor(panelWidth / widthCandleRendered) as int))
-		val candles = (startCandle .. endCandle).map[(indicator.getValue(it) as Decimal).toDouble].toList()
-		val minPrice = candles.min[a, b|a.compareTo(b)]
-		val maxPrice = candles.max[a, b|a.compareTo(b)]
 
-		val axis = NumberAxis.fromRange(minPrice, maxPrice, height)
-		val map = [
-			val valueToAxis = map(it, minPrice, maxPrice, axis.minValue, axis.maxValue)
-			val valueOnChart = map(valueToAxis, axis.minValue, axis.maxValue, 0, -panelHeight)
-			valueOnChart
-		]
+		drawLineIndicator(axis, indicator, markers, g, width, height, x, scaleX, startCandle, endCandle)
+	}
+
+	def drawLineIndicator(NumberAxis axis, Indicator<?> indicator, List<Marker> markers, GraphicsContext g, double width, double height, int x, double scaleX, int startCandle, int endCandle) {
+		val candles = (startCandle .. endCandle).map[(indicator.getValue(it) as Decimal).toDouble].toList()
 
 		g.save()
 		g.translate(Y_AXIS_SIZE + (AXIS_OFFSET / 2), height - (AXIS_OFFSET / 2))
@@ -144,16 +157,15 @@ class RendererDefault implements IRenderer {
 			if(index != 0) {
 				val previous = candles.get(index - 1)
 
-				val startHeight = map.apply(previous)
-				val endHeight = map.apply(tick)
+				val startHeight = axis.map(previous)
+				val endHeight = axis.map(tick)
 
 				g.setStroke(Color.CYAN)
 				g.setLineWidth(1)
 				g.strokeLine(0, startHeight, WIDTH_TICK, endHeight)
 				markers.filter[it.x == startCandle + index].forEach [ marker |
 					g.save()
-					g.translate(WIDTH_TICK, endHeight)
-					marker.renderable.render(g, indicator.timeSeries.getTick(startCandle+index))
+					marker.renderable.render(g, indicator.timeSeries.getTick(startCandle + index))
 					g.restore()
 				]
 				g.translate(WIDTH_TICK, 0)
@@ -161,7 +173,7 @@ class RendererDefault implements IRenderer {
 		]
 		g.restore()
 
-		drawYAxis(g, height, minPrice, maxPrice)
+		drawYAxis(g, height, axis.minValue, axis.maxValue)
 		drawIndicatorName(indicator, g)
 	}
 
