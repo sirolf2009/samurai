@@ -5,10 +5,12 @@ import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.Indicator
 import java.util.List
 import eu.verdelhan.ta4j.Decimal
+import eu.verdelhan.ta4j.TradingRecord
 
 @Data class ChartData {
 	
 	TimeSeries timeseries
+	TradingRecord tradingrecord
 	List<Pair<Integer, List<Indicator<Decimal>>>> indicators
 	List<Pair<Integer, Marker>> markers
 	

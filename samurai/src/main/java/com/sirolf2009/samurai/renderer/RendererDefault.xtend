@@ -1,21 +1,26 @@
 package com.sirolf2009.samurai.renderer
 
+import com.sirolf2009.samurai.criterion.AbsoluteProfitCriterion
+import com.sirolf2009.samurai.criterion.BiggestPendingLossCriterion
+import com.sirolf2009.samurai.criterion.BiggestPendingProfitCriterion
 import com.sirolf2009.samurai.renderer.chart.ChartData
+import com.sirolf2009.samurai.renderer.chart.DateAxis
+import com.sirolf2009.samurai.renderer.chart.Marker
 import com.sirolf2009.samurai.renderer.chart.NumberAxis
 import eu.verdelhan.ta4j.Decimal
 import eu.verdelhan.ta4j.Indicator
 import eu.verdelhan.ta4j.Tick
 import eu.verdelhan.ta4j.TimeSeries
+import eu.verdelhan.ta4j.TradingRecord
+import java.util.ArrayList
 import java.util.List
+import javafx.geometry.VPos
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
-import com.sirolf2009.samurai.renderer.chart.DateAxis
-import javafx.geometry.VPos
 import javafx.scene.text.TextAlignment
-import com.sirolf2009.samurai.renderer.chart.Marker
-import java.util.ArrayList
+
 import static extension com.sirolf2009.samurai.renderer.chart.ChartData.*
 
 class RendererDefault implements IRenderer {
@@ -46,6 +51,7 @@ class RendererDefault implements IRenderer {
 			chart.indicatorsInPanel(0).forEach [
 				drawLineIndicator(axis, it, new ArrayList(), g, canvas.width, heightPerPanel * 2, x, scaleX, startCandle, endCandle)
 			]
+			drawTrades(axis, chart.timeseries, chart.tradingrecord, g, canvas.width, heightPerPanel*2, x, scaleX, startCandle, endCandle)
 			g.translate(0, heightPerPanel * 2)
 		}
 		if(panels > 2) {
@@ -114,10 +120,47 @@ class RendererDefault implements IRenderer {
 	}
 
 	def drawCandlestick(GraphicsContext g, boolean bullish, double yWick, double lengthWick, double yBody, double lengthBody) {
+		g.save()
 		g.fill = Color.WHITE
 		g.fillRect(0, yWick, WIDTH_WICK, lengthWick)
-		g.fill = if(bullish) Color.GREEN else Color.RED
+		g.fill = if(bullish) Color.RED else Color.GREEN
 		g.fillRect(-Math.floor(WIDTH_CANDLESTICK / 2), yBody, WIDTH_CANDLESTICK, lengthBody)
+		g.restore()
+	}
+
+	def drawTrades(NumberAxis axis, TimeSeries series, TradingRecord record, GraphicsContext g, double width, double height, int x, double scaleX, int startCandle, int endCandle) {
+		val candles = (startCandle .. endCandle).map[series.getTick(it)].toList()
+
+		g.save()
+		g.translate(Y_AXIS_SIZE + (AXIS_OFFSET / 2), height - (AXIS_OFFSET / 2))
+		g.scale(scaleX, 1)
+		
+		val profitCrit = new AbsoluteProfitCriterion() 
+		val pendingLossCrit = new BiggestPendingLossCriterion()
+		val pendingProfitCrit = new BiggestPendingProfitCriterion()
+
+		candles.forEach [ it, index |
+			record.trades.filter[entry.index == startCandle + index].forEach [
+				g.save()
+				val pixelsLeft = width - (index*WIDTH_TICK)
+				val tradeWidth = Math.min((exit.index-entry.index)*WIDTH_TICK, pixelsLeft)
+				val entryOnChart = axis.map(entry.price.toDouble())
+				val exitOnChart = axis.map(exit.price.toDouble)
+				val profit = profitCrit.calculate(series, it)
+				val pendingLoss = pendingLossCrit.calculate(series, it)
+				val pendingProfit = pendingProfitCrit.calculate(series, it)
+				g.fill = new Color(1, 0, 0, 0.25)
+				g.fillRect(0, entryOnChart, tradeWidth, Math.abs(axis.map(entry.price.toDouble())-axis.map(entry.price.toDouble()-pendingLoss)))
+				g.fill = new Color(0, 1, 0, 0.25)
+				g.fillRect(0, axis.map(entry.price.toDouble()+pendingProfit), tradeWidth, axis.map(entry.price.toDouble())-axis.map(entry.price.toDouble()+pendingProfit))
+				g.fill = if(profit > 0) new Color(0, 1, 0, 0.5) else new Color(1, 0, 0, 0.5)
+				g.fillRect(0, Math.min(entryOnChart, exitOnChart), tradeWidth, Math.abs(exitOnChart-entryOnChart))
+				g.restore()
+			]
+
+			g.translate(WIDTH_TICK, 0)
+		]
+		g.restore()
 	}
 
 	def drawLineIndicatorChart(Indicator<Decimal> indicator, List<Marker> markers, GraphicsContext g, double width, double height, int x, double scaleX) {

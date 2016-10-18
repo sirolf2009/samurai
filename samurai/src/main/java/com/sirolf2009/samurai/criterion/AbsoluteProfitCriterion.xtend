@@ -23,11 +23,11 @@ class AbsoluteProfitCriterion extends AbstractAnalysisCriterion {
 	}
 	
     def double calculateProfit(TimeSeries series, Trade trade) {
-        if (trade.isClosed()) {
+        if (trade.closed) {
             val exitClosePrice = series.getTick(trade.getExit().getIndex()).getClosePrice()
             val entryClosePrice = series.getTick(trade.getEntry().getIndex()).getClosePrice()
-
-            if (trade.getEntry().isBuy()) {
+            
+            if (trade.entry.isBuy()) {
                 return exitClosePrice.minus(entryClosePrice).toDouble()
             } else {
                 return entryClosePrice.minus(exitClosePrice).toDouble()
