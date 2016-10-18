@@ -17,7 +17,7 @@ import org.eclipse.xtend.lib.annotations.Data
 	boolean isVertical
 	
 	def map(double value) {
-		val valueToAxis = map(value, minValueData, maxValueData, minValue, maxValue)
+		val valueToAxis = if(minValueData < minValue) map(value, minValueData, maxValueData, minValue, maxValue) else value
 		val valueOnChart = map(valueToAxis, minValue, maxValue, 0, if(isVertical) -panelSize else panelSize)
 		valueOnChart
 	}
@@ -31,11 +31,11 @@ import org.eclipse.xtend.lib.annotations.Data
 	}
 
 	def static NumberAxis fromRange(double minValueUgly, double maxValue, double length, double labels) {
-		val minValue = minValueUgly.pretty()
+		val minValue = if(minValueUgly.pretty() < maxValue) minValueUgly.pretty() else minValueUgly
 		val range = (maxValue - minValue)
 		
 		if(range == 0) {
-			return new NumberAxis(#[], 0, minValueUgly, maxValue, minValueUgly, maxValue, length, true)
+			return new NumberAxis(#[], 0, minValueUgly, maxValue, minValue, maxValue, length, true)
 		}
 		
 		val exponent = Math.log10(range)
@@ -62,7 +62,7 @@ import org.eclipse.xtend.lib.annotations.Data
 
 		val formatter = new DecimalFormat(format)
 		val ticks = new ArrayList()
-		for (var i = minValue.pretty; i < maxValue; i += roundedTickRange) {
+		for (var i = minValue; i < maxValue; i += roundedTickRange) {
 			ticks.add(formatter.format(i))
 		}
 		return new NumberAxis(ticks, roundedTickRange, minValueUgly, maxValue, minValue, maxValue, length, true)

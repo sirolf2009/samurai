@@ -116,14 +116,14 @@ class RendererDefault implements IRenderer {
 		]
 		g.restore()
 
-		drawYAxis(g, height, axis.minValue, axis.maxValue)
+		axis.drawYAxis(g)
 	}
 
 	def drawCandlestick(GraphicsContext g, boolean bullish, double yWick, double lengthWick, double yBody, double lengthBody) {
 		g.save()
 		g.fill = Color.WHITE
 		g.fillRect(0, yWick, WIDTH_WICK, lengthWick)
-		g.fill = if(bullish) Color.RED else Color.GREEN
+		g.fill = if(bullish) Color.GREEN else Color.RED
 		g.fillRect(-Math.floor(WIDTH_CANDLESTICK / 2), yBody, WIDTH_CANDLESTICK, lengthBody)
 		g.restore()
 	}
@@ -139,7 +139,7 @@ class RendererDefault implements IRenderer {
 		val pendingLossCrit = new BiggestPendingLossCriterion()
 		val pendingProfitCrit = new BiggestPendingProfitCriterion()
 
-		candles.forEach [ it, index |
+		candles.forEach [ candle, index |
 			record.trades.filter[entry.index == startCandle + index].forEach [
 				g.save()
 				val pixelsLeft = width - (index*WIDTH_TICK)
@@ -149,6 +149,7 @@ class RendererDefault implements IRenderer {
 				val profit = profitCrit.calculate(series, it)
 				val pendingLoss = pendingLossCrit.calculate(series, it)
 				val pendingProfit = pendingProfitCrit.calculate(series, it)
+				
 				g.fill = new Color(1, 0, 0, 0.25)
 				g.fillRect(0, entryOnChart, tradeWidth, Math.abs(axis.map(entry.price.toDouble())-axis.map(entry.price.toDouble()-pendingLoss)))
 				g.fill = new Color(0, 1, 0, 0.25)
@@ -216,7 +217,7 @@ class RendererDefault implements IRenderer {
 		]
 		g.restore()
 
-		drawYAxis(g, height, axis.minValue, axis.maxValue)
+		axis.drawYAxis(g)
 		drawIndicatorName(indicator, g)
 	}
 
@@ -224,17 +225,14 @@ class RendererDefault implements IRenderer {
 		g.fillText(indicator.toString(), Y_AXIS_SIZE + 2, g.font.size + 2)
 	}
 
-	def drawYAxis(GraphicsContext g, double height, double minPrice, double maxPrice) {
+	def drawYAxis(NumberAxis axis, GraphicsContext g) {
 		g.fill = Color.WHITE
-		g.fillRect(Y_AXIS_SIZE - 1, 0, 1, height)
+		g.fillRect(Y_AXIS_SIZE - 1, 0, 1, axis.panelSize)
 
-		val axisLength = height - AXIS_OFFSET
-
-		val axis = NumberAxis.fromRange(minPrice, maxPrice, axisLength)
 		axis.ticks.forEach [ tick, index |
 			val text = new Text(tick)
-			g.fillText(tick, 0, axisLength - (axisLength / axis.ticks.size * index) + text.layoutBounds.height / 2, Y_AXIS_SIZE - 12)
-			g.fillRect(Y_AXIS_SIZE - 10, axisLength - (axisLength / axis.ticks.size * index), 10, 1)
+			g.fillText(tick, 0, axis.panelSize - (axis.panelSize / axis.ticks.size * index) + text.layoutBounds.height / 2, Y_AXIS_SIZE - 12)
+			g.fillRect(Y_AXIS_SIZE - 10, axis.panelSize - (axis.panelSize / axis.ticks.size * index), 10, 1)
 		]
 	}
 
