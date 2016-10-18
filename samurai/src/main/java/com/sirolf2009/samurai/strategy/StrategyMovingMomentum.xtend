@@ -15,12 +15,15 @@ import eu.verdelhan.ta4j.trading.rules.UnderIndicatorRule
 
 class StrategyMovingMomentum implements IStrategy {
 	
+	// we keep these indicators as variables, so we can re-use them when we're asked what indicators we'd like to show
+	// Note that the type MUST be Indicator<Decimal>
 	var Indicator<Decimal> shortEma
 	var Indicator<Decimal> longEma
 	var Indicator<Decimal> stochasticOscillK
 	var Indicator<Decimal> macd
 	var Indicator<Decimal> emaMacd
 	
+	// we have six parameters for this strategy. The annotation will ensure that the user can change them in the GUI
 	@Param public var shortPeriod = 9
 	@Param public var longPeriod = 26
 	@Param public var stochPeriod = 14
@@ -28,6 +31,7 @@ class StrategyMovingMomentum implements IStrategy {
 	@Param public var macdLongPeriod = 26
 	@Param public var macdSmooth = 18
 	
+	// if this confuses you, you should read the TA4J documentation. Not mine	
 	override setup(TimeSeries series) {
         val closePrice = new ClosePriceIndicator(series)
         
@@ -50,11 +54,12 @@ class StrategyMovingMomentum implements IStrategy {
         return new Strategy(entryRule, exitRule)
 	}
 	
+	// Here we set up our indicators
 	override indicators(TimeSeries series) {
         return #[
-        	0 -> #[shortEma, longEma],
-        	1 -> #[stochasticOscillK],
-        	2 -> #[macd, emaMacd]
+        	0 -> #[shortEma, longEma], //Our ema's should appear in the price panel, so we give them a key of 0
+        	1 -> #[stochasticOscillK], //Our stoch should have it's own panel, we give it a key of 1 and don't add any other indicators
+        	2 -> #[macd, emaMacd] //Our MACD and MACD EMA should both be in the same panel, we give them a key of 2
         ]
 	}
 	
