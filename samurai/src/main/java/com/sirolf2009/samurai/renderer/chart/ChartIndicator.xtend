@@ -4,7 +4,11 @@ import com.sirolf2009.samurai.renderer.RendererDefault
 import eu.verdelhan.ta4j.Decimal
 import eu.verdelhan.ta4j.Indicator
 import javafx.scene.canvas.Canvas
-import javafx.scene.paint.Color
+import javafx.scene.canvas.GraphicsContext
+
+import static com.sirolf2009.samurai.renderer.chart.ChartSettings.*
+
+import static extension com.sirolf2009.samurai.renderer.chart.ChartData.*
 
 class ChartIndicator extends Chart {
 
@@ -12,26 +16,43 @@ class ChartIndicator extends Chart {
 
 	val Indicator<Decimal> indicator
 	val ChartData data
+	val extension GraphicsContext g
 
 	new(Canvas canvas, Indicator<Decimal> indicator, ChartData data) {
 		super(canvas)
 		this.indicator = indicator
 		this.data = data
+		this.g = canvas.graphicsContext2D
 	}
 
 	override draw() {
-		val g = canvas.graphicsContext2D
-		g.save()
-		g.fill = Color.BLACK.brighter
-		g.fillRect(0, 0, canvas.width, canvas.height)
+		save()
+		clearScreen(g)
 
-		renderer.drawLineIndicatorChart(indicator, data.markers.filter[key == 0].map[value].toList(), g, canvas.width, canvas.height, scrollX, zoomX)
+		val panelWidth = canvas.width - Y_AXIS_SIZE - AXIS_OFFSET
+		val widthCandleRendered = WIDTH_TICK * scaleX
+		val startCandle = Math.min(size()-10, Math.max(0, Math.floor(scrollX / WIDTH_TICK))) as int
+		val endCandle = Math.max(0, Math.min(indicator.timeSeries.tickCount - 1, startCandle + Math.floor(panelWidth / widthCandleRendered) as int))
 
-		g.restore()
+		val minPrice = indicator.min(startCandle, endCandle)
+		val maxPrice = indicator.max(startCandle, endCandle)
+		val axis = NumberAxis.fromRange(minPrice, maxPrice, canvas.height - X_AXIS_SIZE - AXIS_OFFSET)
+
+		renderer.drawLineIndicator(axis, indicator, data.markers.filter[key == 0].map[value].toList(), g, panelWidth, canvas.height - X_AXIS_SIZE - AXIS_OFFSET, scrollX, scaleX, startCandle, endCandle)
+		translate(0, canvas.height - X_AXIS_SIZE - AXIS_OFFSET)
+
+		val candles = (startCandle .. endCandle).map[indicator.timeSeries.getTick(it)].toList()
+		drawXAxis(g, candles)
+
+		restore()
 	}
 	
 	override size() {
 		return indicator.timeSeries.tickCount
+	}
+	
+	override getRenderer() {
+		return renderer
 	}
 
 }

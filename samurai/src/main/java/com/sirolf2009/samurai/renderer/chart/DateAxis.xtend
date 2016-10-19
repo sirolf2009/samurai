@@ -6,6 +6,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.util.ArrayList
 import org.joda.time.format.DateTimeFormatter
+import javafx.geometry.Bounds
 
 @Data class DateAxis extends Axis {
 
@@ -27,9 +28,10 @@ import org.joda.time.format.DateTimeFormatter
 	long tick
 	DateTime from
 	DateTime to
+	val Bounds bounds
 
-	def static DateAxis fromRange(DateTime from, DateTime to, double length) {
-		val range = (to.millis - from.millis) / length * 400 // millis per 400 pixels
+	def static DateAxis fromRange(DateTime from, DateTime to, Bounds bounds) {
+		val range = (to.millis - from.millis) / bounds.width * 400 // millis per 400 pixels
 		val tickSpec = if(range < MINUTE * 2) {
 				SECOND_SPEC
 			} else if(range < HOUR * 2) {
@@ -50,7 +52,7 @@ import org.joda.time.format.DateTimeFormatter
 		for (var i = from.millis; i < to.millis; i += tick) {
 			ticks.add(format.print(new DateTime(i)))
 		}
-		return new DateAxis(ticks, tick, from, to)
+		return new DateAxis(ticks, tick, from, to, bounds)
 	}
 
 	@Data static class TickSpecification {
