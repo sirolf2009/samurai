@@ -56,7 +56,6 @@ class TabPaneBacktest extends TabPane {
 		background = new Background(new BackgroundFill(Color.WHITESMOKE, CornerRadii.EMPTY, Insets.EMPTY))
 
 		provider => [
-			period = new Period(1000 * 60 * 60)
 			from = new DateTime(0)
 			to = new DateTime(System.currentTimeMillis)
 			samurai.progressMessage.textProperty.bind(messageProperty)

@@ -4,21 +4,20 @@ import com.sirolf2009.samurai.dataprovider.DataProviderBitcoinCharts
 import com.sirolf2009.samurai.gui.NumberField
 import com.sirolf2009.samurai.gui.NumberSpinner
 import com.sirolf2009.samurai.gui.TabPaneBacktest
+import com.sirolf2009.samurai.gui.TimeframePicker
 import com.sirolf2009.samurai.gui.TreeItemDataProvider
 import com.sirolf2009.samurai.gui.TreeItemStrategy
 import com.sirolf2009.samurai.renderer.chart.Chart
 import com.sirolf2009.samurai.strategy.IStrategy
 import com.sirolf2009.samurai.strategy.Param
+import com.sirolf2009.samurai.strategy.StrategyMovingMomentum
 import com.sirolf2009.samurai.strategy.StrategySMACrossover
 import com.sirolf2009.samurai.tasks.BackTest
 import java.io.FileInputStream
-import java.time.LocalDate
-import java.util.Calendar
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.Button
-import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.Separator
@@ -44,10 +43,10 @@ import javafx.stage.Stage
 import org.eclipse.xtend.lib.annotations.Accessors
 import xtendfx.FXApp
 
+import static java.lang.Thread.*
+
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
 import static extension xtendfx.scene.SceneBuilder.*
-import java.lang.Thread.UncaughtExceptionHandler
-import com.sirolf2009.samurai.strategy.StrategyMovingMomentum
 
 @FXApp @Accessors class Samurai {
 
@@ -78,8 +77,17 @@ import com.sirolf2009.samurai.strategy.StrategyMovingMomentum
 			val parametersGrid = new GridPane() => [
 				padding = new Insets(4)
 			]
+			val timeframePicker = new TimeframePicker() => [
+				satisfiedProperty.addListener [ observable, old, newValue |
+					if(newValue) {
+						parametersPane.graphic = new ImageView(new Image(new FileInputStream("src/main/resources/ok.png")))
+					} else {
+						parametersPane.graphic = null
+					}
+				]
+			]
 			val runBacktest = new Button("Run Backtest") => [
-//				disabledProperty -> dataPane.graphicProperty.isNull().or(strategyPane.graphicProperty.isNull())
+				disableProperty -> dataPane.graphicProperty.isNull().or(strategyPane.graphicProperty.isNull())
 				maxWidth = Double.MAX_VALUE
 				onMouseClicked = [
 					strategy.class.fields.filter [
@@ -101,7 +109,10 @@ import com.sirolf2009.samurai.strategy.StrategyMovingMomentum
 							set(strategy, value)
 						}
 					]
-					backtests.tabs += new Tab(strategy.class.simpleName, new TabPaneBacktest(this, provider.provider.get(), strategy))
+					val provider = provider.provider.get() => [
+						period = timeframePicker.period
+					]
+					backtests.tabs += new Tab(strategy.class.simpleName, new TabPaneBacktest(this, provider, strategy))
 				]
 			]
 
@@ -163,18 +174,11 @@ import com.sirolf2009.samurai.strategy.StrategyMovingMomentum
 				],
 				parametersPane => [
 					expanded = false
-					content = new VBox(
-						parametersGrid,
-						new Separator(),
-						new GridPane() => [
-							val cal = Calendar.instance
-							padding = new Insets(4)
-							add(new Label("From"), 0, 0)
-							add(new DatePicker(LocalDate.ofYearDay(cal.get(Calendar.YEAR), 1)), 1, 0)
-							add(new Label("To"), 0, 1)
-							add(new DatePicker(LocalDate.ofYearDay(cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_YEAR) - 1)), 1, 1)
-						]
-					)
+					content = new VBox => [
+						children += parametersGrid
+						children += new Separator()
+						children += timeframePicker
+					]
 				],
 				runBacktest
 			)
