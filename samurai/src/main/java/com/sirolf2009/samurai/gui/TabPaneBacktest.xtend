@@ -4,6 +4,7 @@ import com.sirolf2009.samurai.Samurai
 import com.sirolf2009.samurai.criterion.AbsoluteProfitCriterion
 import com.sirolf2009.samurai.dataprovider.DataProvider
 import com.sirolf2009.samurai.gui.TabPaneBacktest.TableTrade
+import com.sirolf2009.samurai.indicator.IndicatorAbsoluteCashFlow
 import com.sirolf2009.samurai.renderer.chart.Chart
 import com.sirolf2009.samurai.renderer.chart.ChartData
 import com.sirolf2009.samurai.renderer.chart.ChartIndicator
@@ -40,11 +41,9 @@ import javafx.scene.layout.GridPane
 import javafx.scene.paint.Color
 import javafx.util.Callback
 import org.joda.time.DateTime
-import org.joda.time.Period
 import xtendfx.beans.FXBindable
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
-import com.sirolf2009.samurai.indicator.IndicatorAbsoluteCashFlow
 
 class TabPaneBacktest extends TabPane {
 

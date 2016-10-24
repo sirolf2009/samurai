@@ -8,7 +8,9 @@ import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator
 import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator
 import eu.verdelhan.ta4j.trading.rules.CrossedDownIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.CrossedUpIndicatorRule
+import com.sirolf2009.samurai.Register
 
+@Register(name="SMA crossover")
 class StrategySMACrossover implements IStrategy {
 	
 	// we keep these two indicators as variables, so we can re-use them when we're asked what indicators we'd like to show

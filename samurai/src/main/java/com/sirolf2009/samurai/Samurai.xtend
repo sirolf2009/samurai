@@ -10,8 +10,6 @@ import com.sirolf2009.samurai.gui.TreeItemStrategy
 import com.sirolf2009.samurai.renderer.chart.Chart
 import com.sirolf2009.samurai.strategy.IStrategy
 import com.sirolf2009.samurai.strategy.Param
-import com.sirolf2009.samurai.strategy.StrategyMovingMomentum
-import com.sirolf2009.samurai.strategy.StrategySMACrossover
 import com.sirolf2009.samurai.tasks.BackTest
 import java.io.FileInputStream
 import javafx.beans.property.ReadOnlyObjectProperty
@@ -41,6 +39,9 @@ import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 import org.eclipse.xtend.lib.annotations.Accessors
+import org.reflections.Reflections
+import org.reflections.scanners.SubTypesScanner
+import org.reflections.scanners.TypeAnnotationsScanner
 import xtendfx.FXApp
 
 import static java.lang.Thread.*
@@ -145,8 +146,12 @@ import static extension xtendfx.scene.SceneBuilder.*
 					content = new TreeView => [
 						root = new TreeItem("Strategy") => [
 							children += new TreeItem("Built-In") => [
-								children += new TreeItemStrategy("SMA Crossover", new StrategySMACrossover())
-								children += new TreeItemStrategy("Moving Momentum", new StrategyMovingMomentum())
+								val reflections = new Reflections(new SubTypesScanner(), new TypeAnnotationsScanner())
+								reflections.getTypesAnnotatedWith(Register).filter[interfaces.findFirst[IStrategy.isAssignableFrom(it)] != null].forEach[strategyClass|
+									val name = (strategyClass.annotations.findFirst[annotationType == Register] as Register).name
+									val strategy = strategyClass.newInstance() as IStrategy
+									children += new TreeItemStrategy(name, strategy)
+								]
 							]
 						]
 						showRoot = false
@@ -182,6 +187,10 @@ import static extension xtendfx.scene.SceneBuilder.*
 				],
 				runBacktest
 			)
+			val params = parameters.named
+			if(params.containsKey("strategy")) {
+				//TODO find name in tree
+			}
 		]
 		title = "Samurai"
 		width = 1366
