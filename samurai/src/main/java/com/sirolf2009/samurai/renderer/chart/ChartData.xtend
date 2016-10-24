@@ -1,11 +1,11 @@
 package com.sirolf2009.samurai.renderer.chart
 
-import org.eclipse.xtend.lib.annotations.Data
-import eu.verdelhan.ta4j.TimeSeries
-import eu.verdelhan.ta4j.Indicator
-import java.util.List
 import eu.verdelhan.ta4j.Decimal
+import eu.verdelhan.ta4j.Indicator
+import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.TradingRecord
+import java.util.List
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data class ChartData {
 	

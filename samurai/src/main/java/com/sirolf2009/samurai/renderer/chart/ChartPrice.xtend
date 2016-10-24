@@ -31,7 +31,8 @@ class ChartPrice extends Chart {
 			save()
 			clearScreen(g)
 
-			val panels = 2 + data.indicators.map[key].max // price chart counts as 2, because it should be twice as big
+			val hasIndicators = data.indicators.size != 0
+			val panels = 2 + if(hasIndicators) data.indicators.map[key].max else 0// price chart counts as 2, because it should be twice as big
 			val heightPerPanel = (canvas.height - X_AXIS_SIZE - AXIS_OFFSET) / panels
 
 			val panelWidth = canvas.width - Y_AXIS_SIZE - AXIS_OFFSET
@@ -42,8 +43,8 @@ class ChartPrice extends Chart {
 			
 			{
 				val panelHeight = heightPerPanel * 2 - AXIS_OFFSET
-				val minPrice = Math.min(data.min(startCandle, endCandle), data.min(0, startCandle, endCandle))
-				val maxPrice = Math.max(data.max(startCandle, endCandle), data.max(0, startCandle, endCandle))
+				val minPrice = if(data.indicatorsInPanel(0).size > 0) Math.min(data.min(startCandle, endCandle), data.min(0, startCandle, endCandle)) else data.min(startCandle, endCandle)
+				val maxPrice = if(data.indicatorsInPanel(0).size > 0) Math.max(data.max(startCandle, endCandle), data.max(0, startCandle, endCandle)) else data.max(startCandle, endCandle)
 				val axis = NumberAxis.fromRange(minPrice, maxPrice, panelHeight)
 
 				renderer.drawTimeseries(axis, data.timeseries, data.markers.filter[key == 0].map[value].toList(), g, canvas.width, heightPerPanel * 2, scrollX, scaleX, startCandle, endCandle)

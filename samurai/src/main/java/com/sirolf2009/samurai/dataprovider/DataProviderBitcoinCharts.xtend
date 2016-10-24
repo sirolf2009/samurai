@@ -14,7 +14,8 @@ class DataProviderBitcoinCharts extends DataProvider {
 	var progress = 0
 
 	new(String file) {
-		this(new File(file))
+		file = new File(class.getResource(file).toURI)
+		name = file
 	}
 
 	new(File file) {

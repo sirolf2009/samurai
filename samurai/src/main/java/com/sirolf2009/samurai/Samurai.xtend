@@ -11,7 +11,7 @@ import com.sirolf2009.samurai.renderer.chart.Chart
 import com.sirolf2009.samurai.strategy.IStrategy
 import com.sirolf2009.samurai.strategy.Param
 import com.sirolf2009.samurai.tasks.BackTest
-import java.io.FileInputStream
+import java.io.File
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -69,7 +69,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 			]
 
 			center = backtests
-			val image = new BackgroundImage(new Image(new FileInputStream("src/main/resources/icon.png"), 157, 157, true, true), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)
+			val image = new BackgroundImage(new Image(Samurai.getResourceAsStream("/icon.png"), 157, 157, true, true), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)
 			backtests.background = new Background(#[new BackgroundFill(Color.BLACK.brighter, new CornerRadii(0), new Insets(0))], #[image])
 
 			val dataPane = new TitledPane("Data", null)
@@ -81,7 +81,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 			val timeframePicker = new TimeframePicker() => [
 				satisfiedProperty.addListener [ observable, old, newValue |
 					if(newValue) {
-						parametersPane.graphic = new ImageView(new Image(new FileInputStream("src/main/resources/ok.png")))
+						parametersPane.graphic = new ImageView(new Image(Samurai.getResourceAsStream("/ok.png")))
 					} else {
 						parametersPane.graphic = null
 					}
@@ -122,9 +122,9 @@ import static extension xtendfx.scene.SceneBuilder.*
 					content = new TreeView => [
 						root = new TreeItem("") => [
 							children += new TreeItem("BitcoinCharts") => [
-								children += new TreeItemDataProvider("BTCCNY - OkCoin", [new DataProviderBitcoinCharts("data/okcoinCNY.csv")])
-								children += new TreeItemDataProvider("BTCUSD - OkCoin", [new DataProviderBitcoinCharts("data/bitfinexUSD.csv")])
-								children += new TreeItemDataProvider("BTCUSD - Bitstamp", [new DataProviderBitcoinCharts("data/bitstampUSD.csv")])
+								children += new TreeItemDataProvider("BTCCNY - OkCoin", [new DataProviderBitcoinCharts(new File("data/okcoinCNY.csv"))])
+								children += new TreeItemDataProvider("BTCUSD - OkCoin", [new DataProviderBitcoinCharts(new File("data/bitfinexUSD.csv"))])
+								children += new TreeItemDataProvider("BTCUSD - Bitstamp", [new DataProviderBitcoinCharts(new File("data/bitstampUSD.csv"))])
 							]
 						]
 						showRoot = false
@@ -132,7 +132,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 							val item = (it as ReadOnlyObjectProperty<TreeItem<String>>).value
 							if(item instanceof TreeItemDataProvider) {
 								provider = item as TreeItemDataProvider
-								dataPane.graphic = new ImageView(new Image(new FileInputStream("src/main/resources/ok.png")))
+								dataPane.graphic = new ImageView(new Image(Samurai.getResourceAsStream("/ok.png")))
 								dataPane.expanded = false
 								strategyPane.expanded = true
 								parametersPane.expanded = false
@@ -146,7 +146,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 					content = new TreeView => [
 						root = new TreeItem("Strategy") => [
 							children += new TreeItem("Built-In") => [
-								val reflections = new Reflections(new SubTypesScanner(), new TypeAnnotationsScanner())
+								val reflections = new Reflections("", new SubTypesScanner(), new TypeAnnotationsScanner())
 								reflections.getTypesAnnotatedWith(Register).filter[interfaces.findFirst[IStrategy.isAssignableFrom(it)] != null].forEach[strategyClass|
 									val name = (strategyClass.annotations.findFirst[annotationType == Register] as Register).name
 									val strategy = strategyClass.newInstance() as IStrategy
@@ -159,7 +159,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 							val item = (it as ReadOnlyObjectProperty<TreeItem<String>>).value
 							if(item instanceof TreeItemStrategy) {
 								strategy = item.strategy
-								strategyPane.graphic = new ImageView(new Image(new FileInputStream("src/main/resources/ok.png")))
+								strategyPane.graphic = new ImageView(new Image(Samurai.getResourceAsStream("/ok.png")))
 								dataPane.expanded = false
 								strategyPane.expanded = false
 								parametersPane.expanded = true
@@ -195,7 +195,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 		title = "Samurai"
 		width = 1366
 		height = 768
-		icons += new Image(new FileInputStream("src/main/resources/icon.png"))
+		icons += new Image(Samurai.getResourceAsStream("/icon.png"))
 		show
 
 		Thread.defaultUncaughtExceptionHandler = [ t, e |
