@@ -72,7 +72,7 @@ import javafx.scene.paint.Color
 	def void fitAll() {
 		val width = canvas.width - (Y_AXIS_SIZE + AXIS_OFFSET)
 		val count = size()
-		scaleX = Math.min(0.1, width / count / WIDTH_TICK)
+		scaleX = Math.min(0.01, width / count / WIDTH_TICK)
 		draw()
 	}
 	
