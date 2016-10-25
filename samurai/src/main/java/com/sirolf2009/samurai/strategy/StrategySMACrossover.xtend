@@ -1,5 +1,6 @@
 package com.sirolf2009.samurai.strategy
 
+import com.sirolf2009.samurai.annotations.Register
 import eu.verdelhan.ta4j.Decimal
 import eu.verdelhan.ta4j.Indicator
 import eu.verdelhan.ta4j.Strategy
@@ -8,7 +9,6 @@ import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator
 import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator
 import eu.verdelhan.ta4j.trading.rules.CrossedDownIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.CrossedUpIndicatorRule
-import com.sirolf2009.samurai.Register
 
 @Register(name="SMA crossover")
 class StrategySMACrossover implements IStrategy {
