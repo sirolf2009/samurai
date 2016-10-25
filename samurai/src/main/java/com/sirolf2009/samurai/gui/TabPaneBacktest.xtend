@@ -40,7 +40,6 @@ import javafx.scene.layout.CornerRadii
 import javafx.scene.layout.GridPane
 import javafx.scene.paint.Color
 import javafx.util.Callback
-import org.joda.time.DateTime
 import xtendfx.beans.FXBindable
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
@@ -55,8 +54,6 @@ class TabPaneBacktest extends TabPane {
 		background = new Background(new BackgroundFill(Color.WHITESMOKE, CornerRadii.EMPTY, Insets.EMPTY))
 
 		provider => [
-			from = new DateTime(0)
-			to = new DateTime(System.currentTimeMillis)
 			samurai.progressMessage.textProperty.bind(messageProperty)
 			samurai.progressIndicator.progressProperty.bind(progressProperty)
 		]

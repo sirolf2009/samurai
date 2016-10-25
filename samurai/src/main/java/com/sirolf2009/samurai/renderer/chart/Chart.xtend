@@ -4,15 +4,16 @@ import com.sirolf2009.samurai.renderer.IRenderer
 import eu.verdelhan.ta4j.Tick
 import java.util.List
 import javafx.geometry.BoundingBox
+import javafx.geometry.Bounds
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
+import javafx.scene.paint.Color
+import javafx.scene.text.TextAlignment
 import org.eclipse.xtend.lib.annotations.Accessors
 
 import static com.sirolf2009.samurai.renderer.chart.ChartSettings.*
-import javafx.geometry.Bounds
-import javafx.scene.paint.Color
 
 @Accessors abstract class Chart {
 
@@ -21,22 +22,22 @@ import javafx.scene.paint.Color
 	var DragDetector dragDetector
 	var int scrollX
 	var double scaleX
-	
+
 	var Bounds xAxisBounds
 
 	new(Canvas canvas) {
 		this.canvas = canvas
 		scrollX = 0
 		scaleX = 1
-		
+
 		calculateXAxisBounds()
-		
-		canvas.widthProperty.addListener[
+
+		canvas.widthProperty.addListener [
 			calculateXAxisBounds()
 			draw()
 		]
-		
-		canvas.heightProperty.addListener[
+
+		canvas.heightProperty.addListener [
 			calculateXAxisBounds()
 			draw()
 		]
@@ -61,7 +62,7 @@ import javafx.scene.paint.Color
 	def void draw()
 
 	def int size()
-	
+
 	def IRenderer getRenderer()
 
 	def clearScreen(extension GraphicsContext g) {
@@ -75,9 +76,9 @@ import javafx.scene.paint.Color
 		scaleX = Math.min(0.01, width / count / WIDTH_TICK)
 		draw()
 	}
-	
+
 	def calculateXAxisBounds() {
-		xAxisBounds = new BoundingBox(Y_AXIS_SIZE + WIDTH_TICK/2, canvas.height - X_AXIS_SIZE, 0, canvas.width - Y_AXIS_SIZE, X_AXIS_SIZE, 0)
+		xAxisBounds = new BoundingBox(Y_AXIS_SIZE + WIDTH_TICK / 2, canvas.height - X_AXIS_SIZE, 0, canvas.width - Y_AXIS_SIZE, X_AXIS_SIZE, 0)
 	}
 
 	def drawXAxis(GraphicsContext g, List<Tick> candles) {
@@ -86,11 +87,17 @@ import javafx.scene.paint.Color
 		val axis = DateAxis.fromRange(from, to, xAxisBounds)
 		renderer.drawXAxis(axis, g)
 	}
-	
+
+	def drawNoData() {
+		canvas.graphicsContext2D.fill = Color.WHITESMOKE
+		canvas.graphicsContext2D.textAlign = TextAlignment.CENTER
+		canvas.graphicsContext2D.fillText("No Data", canvas.width / 2, canvas.height / 2)
+	}
+
 	abstract static class DragDetector {
-		
+
 		def void onMouseEvent(MouseEvent event)
-		
+
 	}
 
 	static class PanDetector extends DragDetector {
@@ -104,10 +111,10 @@ import javafx.scene.paint.Color
 			this.startX = startX
 			this.scrollX = scrollX
 		}
-		
+
 		override onMouseEvent(MouseEvent event) {
 			val newX = event.sceneX
-			val delta = (startX - newX) * (1/chart.scaleX)
+			val delta = (startX - newX) * (1 / chart.scaleX)
 			val ticks = Math.floor(Math.abs(delta)) as int
 			val newScrollX = if(delta < 0) scrollX - ticks else scrollX + ticks
 			chart.scrollX = Math.max(0, newScrollX)
@@ -124,7 +131,7 @@ import javafx.scene.paint.Color
 			this.chart = chart
 			this.previousX = startX
 		}
-		
+
 		override onMouseEvent(MouseEvent event) {
 			val newX = event.sceneX
 			val delta = previousX - newX

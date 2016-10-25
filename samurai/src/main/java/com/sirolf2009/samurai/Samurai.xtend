@@ -112,6 +112,8 @@ import static extension xtendfx.scene.SceneBuilder.*
 					]
 					val provider = provider.provider.get() => [
 						period = timeframePicker.period
+						from = timeframePicker.from
+						to = timeframePicker.to
 					]
 					backtests.tabs += new Tab(strategy.class.simpleName, new TabPaneBacktest(this, provider, strategy))
 				]

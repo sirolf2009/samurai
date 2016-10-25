@@ -15,11 +15,15 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.joda.time.Period
+import org.joda.time.DateTime
+import java.time.ZoneId
 
 class TimeframePicker extends VBox {
 
 	@Accessors var BooleanProperty satisfiedProperty = new SimpleBooleanProperty(false)
 	@Accessors var Period period
+	@Accessors var DateTime from
+	@Accessors var DateTime to
 	@Accessors var ToggleGroup group = new ToggleGroup()
 
 	new() {
@@ -47,9 +51,16 @@ class TimeframePicker extends VBox {
 			val cal = Calendar.instance
 			padding = new Insets(4)
 			add(new Label("From"), 0, 0)
-			add(new DatePicker(LocalDate.ofYearDay(cal.get(Calendar.YEAR), 1)), 1, 0)
+			add(new DatePicker(LocalDate.ofYearDay(cal.get(Calendar.YEAR), 1)) => [
+				onAction = [from = new DateTime((source as DatePicker).value.atStartOfDay(ZoneId.systemDefault).toEpochSecond()*1000)]
+			], 1, 0)
 			add(new Label("To"), 0, 1)
-			add(new DatePicker(LocalDate.ofYearDay(cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_YEAR) - 1)), 1, 1)
+			add(new DatePicker(LocalDate.ofYearDay(cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_YEAR) - 1)) => [
+				onAction = [to = new DateTime((source as DatePicker).value.atStartOfDay(ZoneId.systemDefault).toEpochSecond()*1000)]
+			], 1, 1)
+			
+			from = new DateTime(cal.get(Calendar.YEAR)-1, 1, 1, 1, 0)
+			to = new DateTime(cal.get(Calendar.YEAR), 1, 1, 1, 0)
 		]
 	}
 

@@ -31,26 +31,30 @@ class ChartIndicator extends Chart {
 
 		val panelWidth = canvas.width - Y_AXIS_SIZE - AXIS_OFFSET
 		val widthCandleRendered = WIDTH_TICK * scaleX
-		val startCandle = Math.min(size()-10, Math.max(0, Math.floor(scrollX / WIDTH_TICK))) as int
+		val startCandle = Math.min(Math.max(0, size() - 10), Math.max(0, Math.floor(scrollX / WIDTH_TICK))) as int
 		val endCandle = Math.max(0, Math.min(indicator.timeSeries.tickCount - 1, startCandle + Math.floor(panelWidth / widthCandleRendered) as int))
 
-		val minPrice = indicator.min(startCandle, endCandle)
-		val maxPrice = indicator.max(startCandle, endCandle)
-		val axis = NumberAxis.fromRange(minPrice, maxPrice, canvas.height - X_AXIS_SIZE - AXIS_OFFSET)
+		if(startCandle == endCandle) {
+			drawNoData()
+		} else {
+			val minPrice = indicator.min(startCandle, endCandle)
+			val maxPrice = indicator.max(startCandle, endCandle)
+			val axis = NumberAxis.fromRange(minPrice, maxPrice, canvas.height - X_AXIS_SIZE - AXIS_OFFSET)
 
-		renderer.drawLineIndicator(axis, indicator, data.markers.filter[key == 0].map[value].toList(), g, panelWidth, canvas.height - X_AXIS_SIZE - AXIS_OFFSET, scrollX, scaleX, startCandle, endCandle)
-		translate(0, canvas.height - X_AXIS_SIZE - AXIS_OFFSET)
+			renderer.drawLineIndicator(axis, indicator, data.markers.filter[key == 0].map[value].toList(), g, panelWidth, canvas.height - X_AXIS_SIZE - AXIS_OFFSET, scrollX, scaleX, startCandle, endCandle)
+			translate(0, canvas.height - X_AXIS_SIZE - AXIS_OFFSET)
 
-		val candles = (startCandle .. endCandle).map[indicator.timeSeries.getTick(it)].toList()
-		drawXAxis(g, candles)
+			val candles = (startCandle .. endCandle).map[indicator.timeSeries.getTick(it)].toList()
+			drawXAxis(g, candles)
 
-		restore()
+			restore()
+		}
 	}
-	
+
 	override size() {
 		return indicator.timeSeries.tickCount
 	}
-	
+
 	override getRenderer() {
 		return renderer
 	}
