@@ -52,24 +52,16 @@ class TabPaneBacktest extends TabPane {
 
 	new(Samurai samurai, DataProvider provider, IStrategy strategy) {
 		background = new Background(new BackgroundFill(Color.WHITESMOKE, CornerRadii.EMPTY, Insets.EMPTY))
-
-		provider => [
-			samurai.progressMessage.textProperty.bind(messageProperty)
-			samurai.progressIndicator.progressProperty.bind(progressProperty)
-		]
-
-		new Thread(provider).start()
-
+		
+		samurai.statusBar.task = provider
 		provider.onFailed = showErrorDialog
+		new Thread(provider).start()
 
 		provider.onSucceeded = [
 			val backTest = new BackTest(samurai, strategy, it.source.value as TimeSeries)
 
-			samurai.progressMessage.textProperty.bind(backTest.messageProperty)
-			samurai.progressIndicator.progressProperty.bind(backTest.progressProperty)
-
+			samurai.statusBar.task = backTest
 			backTest.onFailed = showErrorDialog
-
 			backTest.onSucceeded = [ backtestResult |
 				val tradingRecord = backtestResult.source.value as TradingRecord
 

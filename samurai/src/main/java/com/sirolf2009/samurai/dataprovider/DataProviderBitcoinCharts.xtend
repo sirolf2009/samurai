@@ -29,6 +29,7 @@ class DataProviderBitcoinCharts extends DataProvider {
 		val scanner = new Scanner(file)
 		val size = file.length
 
+		updateMessage("Loading data")
 		while(scanner.hasNextLine() && !isCancelled) {
 			val line = scanner.nextLine()
 			val data = line.split(",")
