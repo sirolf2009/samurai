@@ -22,6 +22,7 @@ import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
+import com.sirolf2009.samurai.gui.SetupBacktest
 
 class SamuraiBacktest extends BorderPane {
 
@@ -67,6 +68,18 @@ class SamuraiBacktest extends BorderPane {
 		left = new VBox(
 			simulationSetup,
 			runBacktest
+		)
+		
+		val setup = new SetupBacktest()
+		left = new VBox(
+			setup,
+			new Button("Run Backtest") => [
+				disableProperty.bind(setup.backtestSetupProperty.^null)
+				onAction = [
+					val backtestSetup = setup.backtestSetupProperty.get()
+					backtests.tabs += new Tab(backtestSetup.strategy.class.simpleName, new TabPaneBacktest(samurai, backtestSetup.dataProvider, backtestSetup.strategy))
+				]
+			]
 		)
 	}
 

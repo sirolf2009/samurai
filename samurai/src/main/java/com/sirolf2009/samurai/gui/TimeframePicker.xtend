@@ -20,7 +20,7 @@ import java.time.ZoneId
 
 class TimeframePicker extends VBox {
 
-	@Accessors var BooleanProperty satisfiedProperty = new SimpleBooleanProperty(false)
+	@Accessors var BooleanProperty satisfiedProperty = new SimpleBooleanProperty(this, "satisfied", false)
 	@Accessors var Period period
 	@Accessors var DateTime from
 	@Accessors var DateTime to
