@@ -10,9 +10,9 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.joda.time.DateTime
 import org.joda.time.Period
 
-class SetupBacktest extends VBox {
+class SetupOptimize extends VBox {
 
-	@Accessors val SimpleObjectProperty<BacktestSetup> backtestSetupProperty = new SimpleObjectProperty<BacktestSetup>(this, "backtestSetup")
+	@Accessors val SimpleObjectProperty<OptimizeSetup> backtestSetupProperty = new SimpleObjectProperty<OptimizeSetup>(this, "backtestSetup")
 
 	val PickerDataprovider pickerDataProvider
 	val PickerStrategy pickerStrategy
@@ -53,7 +53,7 @@ class SetupBacktest extends VBox {
 					from = pickerTimeframe.fromProperty.get()
 					to = pickerTimeframe.toProperty.get()
 				]
-				backtestSetupProperty.set(new BacktestSetup(provider, pickerStrategy.strategyProperty.get, pickerTimeframe.periodProperty.get, pickerTimeframe.fromProperty.get, pickerTimeframe.toProperty.get))
+				backtestSetupProperty.set(new OptimizeSetup(provider, pickerStrategy.strategyProperty.get, pickerTimeframe.periodProperty.get, pickerTimeframe.fromProperty.get, pickerTimeframe.toProperty.get))
 			} else {
 				backtestSetupProperty.set(null)
 			}
@@ -65,7 +65,7 @@ class SetupBacktest extends VBox {
 		children.addAll(pickerDataProvider, pickerStrategy, pickerTimeframe, pickerParameters)
 	}
 
-	@Data static class BacktestSetup {
+	@Data static class OptimizeSetup {
 
 		DataProvider dataProvider
 		IStrategy strategy

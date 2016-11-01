@@ -1,7 +1,7 @@
 package com.sirolf2009.samurai.gui
 
+import com.sirolf2009.samurai.Registered
 import com.sirolf2009.samurai.Samurai
-import com.sirolf2009.samurai.annotations.Register
 import com.sirolf2009.samurai.strategy.IStrategy
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.SimpleBooleanProperty
@@ -12,9 +12,6 @@ import javafx.scene.control.TreeView
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import org.eclipse.xtend.lib.annotations.Accessors
-import org.reflections.Reflections
-import org.reflections.scanners.SubTypesScanner
-import org.reflections.scanners.TypeAnnotationsScanner
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
 
@@ -27,13 +24,13 @@ class PickerStrategy extends TitledPane {
 		super("Strategy", null)
 		expanded = false
 		content = new TreeView => [
-			root = new TreeItem("Strategy") => [
-				children += new TreeItem("Built-In") => [
-					val reflections = new Reflections("", new SubTypesScanner(), new TypeAnnotationsScanner())
-					reflections.getTypesAnnotatedWith(Register).filter[interfaces.findFirst[IStrategy.isAssignableFrom(it)] != null].forEach [ strategyClass |
-						val name = (strategyClass.annotations.findFirst[annotationType == Register] as Register).name
-						val strategy = strategyClass.newInstance() as IStrategy
-						children += new TreeItemStrategy(name, strategy)
+			root = new TreeItem("Strategy") => [root|
+				Registered.strategies.groupBy[type].entrySet.forEach[
+					val strategies = value
+					root.children += new TreeItem(key) => [type|
+						strategies.forEach[
+							type.children += new TreeItemStrategy(name, clazz.newInstance)
+						]
 					]
 				]
 			]

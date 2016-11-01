@@ -19,6 +19,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 	var BorderPane root
 
 	override void start(Stage it) {
+		Registered.runRegistration()
 		BorderedScene[
 			root = it
 			top = new SamuraiMenuBar(this)

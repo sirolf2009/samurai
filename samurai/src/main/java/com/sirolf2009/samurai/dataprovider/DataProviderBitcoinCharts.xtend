@@ -5,6 +5,7 @@ import java.io.File
 import java.util.LinkedList
 import java.util.Scanner
 import org.joda.time.DateTime
+import com.sirolf2009.samurai.annotations.Register
 
 class DataProviderBitcoinCharts extends DataProvider {
 
@@ -51,6 +52,13 @@ class DataProviderBitcoinCharts extends DataProvider {
 		removeEmptyTicks(ticks)
 
 		return new TimeSeries(name, ticks)
+	}
+	
+	@Register(name="Bitstamp USD", type="Built-In")
+	public static class DataproviderBitstampUSD extends DataProviderBitcoinCharts {
+		new() {
+			super(new File("data/bitstampUSD.csv"))
+		}
 	}
 
 }

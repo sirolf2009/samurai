@@ -1,21 +1,22 @@
 package com.sirolf2009.samurai
 
-import javafx.scene.layout.BorderPane
-import com.sirolf2009.samurai.gui.SimulationSetup
-import javafx.scene.layout.VBox
+import com.sirolf2009.samurai.gui.SetupOptimize
 import javafx.scene.control.TitledPane
-import javafx.scene.control.TreeView
 import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeView
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.VBox
+
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
 
 class SamuraiOptimize extends BorderPane {
 
-	val SimulationSetup simulationSetup
+	val SetupOptimize optimizeSetup
 
 	new(Samurai samurai) {
-		simulationSetup = new SimulationSetup()
+		optimizeSetup = new SetupOptimize()
 		left = new VBox(
-			simulationSetup,
+			optimizeSetup,
 			new TitledPane("Optimizers", null) => [
 				content = new TreeView() => [
 					root = new TreeItem("Optimizers") => [
@@ -26,7 +27,7 @@ class SamuraiOptimize extends BorderPane {
 					showRoot = false
 					expandAllNodes
 				]
-				expandedProperty.bind(simulationSetup.parametersPane.expandedProperty)
+//				expandedProperty.bind(optimizeSetup.parametersPane.expandedProperty)
 			]
 		)
 	}

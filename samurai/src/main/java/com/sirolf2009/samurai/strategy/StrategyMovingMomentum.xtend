@@ -14,7 +14,7 @@ import eu.verdelhan.ta4j.trading.rules.CrossedUpIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.OverIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.UnderIndicatorRule
 
-@Register(name="Moving momentum")
+@Register(name="Moving momentum", type="Built-In")
 class StrategyMovingMomentum implements IStrategy {
 	
 	// we keep these indicators as variables, so we can re-use them when we're asked what indicators we'd like to show
