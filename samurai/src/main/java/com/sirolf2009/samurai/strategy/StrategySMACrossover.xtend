@@ -9,6 +9,7 @@ import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator
 import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator
 import eu.verdelhan.ta4j.trading.rules.CrossedDownIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.CrossedUpIndicatorRule
+import org.eclipse.xtend.lib.annotations.Accessors
 
 @Register(name="SMA crossover", type="Built-In")
 class StrategySMACrossover implements IStrategy {
@@ -18,9 +19,9 @@ class StrategySMACrossover implements IStrategy {
 	var Indicator<Decimal> shortSma
 	var Indicator<Decimal> longSma
 	
-	// we have two parameters for this strategy. The annotation will ensure that the user can change them in the GUI
-	@Param public var shortPeriod = 5
-	@Param public var longPeriod = 30
+	// we have two parameters for this strategy. These annotations will ensure that the user can change them in the GUI
+	@Param @Accessors var int shortPeriod = 5
+	@Param @Accessors var int longPeriod = 30
 
 	// if this confuses you, you should read the TA4J documentation. Not mine	
 	override setup(TimeSeries series) {

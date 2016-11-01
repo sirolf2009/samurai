@@ -2,7 +2,6 @@ package com.sirolf2009.samurai.gui
 
 import com.sirolf2009.samurai.dataprovider.DataProvider
 import com.sirolf2009.samurai.gui.picker.PickerDataprovider
-import com.sirolf2009.samurai.gui.picker.PickerParameters
 import com.sirolf2009.samurai.gui.picker.PickerStrategy
 import com.sirolf2009.samurai.gui.picker.PickerTimeframe
 import com.sirolf2009.samurai.strategy.IStrategy
@@ -13,6 +12,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.Data
 import org.joda.time.DateTime
 import org.joda.time.Period
+import com.sirolf2009.samurai.gui.picker.PickerParameters
 
 class SetupBacktest extends VBox {
 

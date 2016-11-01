@@ -35,7 +35,7 @@ import org.eclipse.xtend.lib.annotations.Data
 		val range = (maxValue - minValue)
 		
 		if(range == 0) {
-			return new NumberAxis(#[], 0, minValueUgly, maxValue, minValue, maxValue, length, true)
+			return fromRange(minValueUgly - 1, maxValue+1, length, labels)
 		}
 		
 		val exponent = Math.log10(range)

@@ -13,6 +13,7 @@ import eu.verdelhan.ta4j.trading.rules.CrossedDownIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.CrossedUpIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.OverIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.UnderIndicatorRule
+import org.eclipse.xtend.lib.annotations.Accessors
 
 @Register(name="Moving momentum", type="Built-In")
 class StrategyMovingMomentum implements IStrategy {
@@ -25,13 +26,13 @@ class StrategyMovingMomentum implements IStrategy {
 	var Indicator<Decimal> macd
 	var Indicator<Decimal> emaMacd
 	
-	// we have six parameters for this strategy. The annotation will ensure that the user can change them in the GUI
-	@Param public var shortPeriod = 9
-	@Param public var longPeriod = 26
-	@Param public var stochPeriod = 14
-	@Param public var macdShortPeriod = 9
-	@Param public var macdLongPeriod = 26
-	@Param public var macdSmooth = 18
+	// we have six parameters for this strategy. These annotations will ensure that the user can change them in the GUI
+	@Accessors @Param var int shortPeriod = 9
+	@Accessors @Param var int longPeriod = 26
+	@Accessors @Param var int stochPeriod = 14
+	@Accessors @Param var int macdShortPeriod = 9
+	@Accessors @Param var int macdLongPeriod = 26
+	@Accessors @Param var int macdSmooth = 18
 	
 	// if this confuses you, you should read the TA4J documentation. Not mine	
 	override setup(TimeSeries series) {

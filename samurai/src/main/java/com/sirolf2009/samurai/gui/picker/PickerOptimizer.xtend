@@ -39,8 +39,8 @@ class PickerOptimizer extends TitledPane {
 				Registered.optimizers.groupBy[type].entrySet.forEach[
 					val optimizers = value
 					root.children += new TreeItem(key) => [type|
-						optimizers.forEach[optimizer|
-							type.children += new TreeItem(optimizer.clazz.newInstance)
+						optimizers.forEach[
+							type.children += new TreeItem(it)
 						]
 					]
 				]
@@ -51,6 +51,7 @@ class PickerOptimizer extends TitledPane {
 				if(item.value instanceof Registration<?>) {
 					optimizerProperty.set((item.value as Registration<IOptimizer>).clazz.newInstance)
 				} else {
+					println(item)
 					optimizerProperty.set(null)
 				}
 			]

@@ -3,7 +3,7 @@ package com.sirolf2009.samurai.gui
 import com.sirolf2009.samurai.dataprovider.DataProvider
 import com.sirolf2009.samurai.gui.picker.PickerDataprovider
 import com.sirolf2009.samurai.gui.picker.PickerOptimizer
-import com.sirolf2009.samurai.gui.picker.PickerParameters
+import com.sirolf2009.samurai.gui.picker.PickerOptimizerParameters
 import com.sirolf2009.samurai.gui.picker.PickerStrategy
 import com.sirolf2009.samurai.gui.picker.PickerTimeframe
 import com.sirolf2009.samurai.strategy.IStrategy
@@ -23,14 +23,14 @@ class SetupOptimize extends VBox {
 	val PickerStrategy pickerStrategy
 	val PickerOptimizer pickerOptimizer
 	val PickerTimeframe pickerTimeframe
-	val PickerParameters pickerParameters
+	val PickerOptimizerParameters pickerParameters
 
 	new() {
 		pickerDataProvider = new PickerDataprovider()
 		pickerStrategy = new PickerStrategy()
 		pickerOptimizer = new PickerOptimizer()
 		pickerTimeframe = new PickerTimeframe()
-		pickerParameters = new PickerParameters(pickerStrategy.strategyProperty)
+		pickerParameters = new PickerOptimizerParameters(pickerOptimizer.optimizerProperty, pickerStrategy.strategyProperty)
 
 		pickerDataProvider.providerProperty.addListener [
 			if(pickerDataProvider.satisfiedProperty.get) {
@@ -60,13 +60,11 @@ class SetupOptimize extends VBox {
 			}
 		]
 		pickerTimeframe.timeframeProperty.addListener [
-			if(pickerTimeframe.satisfiedProperty.get) {
-				pickerDataProvider.expanded = false
-				pickerStrategy.expanded = false
-				pickerOptimizer.expanded = false
-				pickerTimeframe.expanded = false
-				pickerParameters.expanded = true
-			}
+			pickerDataProvider.expanded = false
+			pickerStrategy.expanded = false
+			pickerOptimizer.expanded = false
+			pickerTimeframe.expanded = false
+			pickerParameters.expanded = true
 		]
 
 		pickerDataProvider.expanded = true
