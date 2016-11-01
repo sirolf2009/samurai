@@ -1,5 +1,6 @@
-package com.sirolf2009.samurai.gui
+package com.sirolf2009.samurai.gui.picker
 
+import com.sirolf2009.samurai.gui.NumberSpinner
 import com.sirolf2009.samurai.strategy.Param
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleMapProperty

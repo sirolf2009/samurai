@@ -1,4 +1,4 @@
-package com.sirolf2009.samurai.gui
+package com.sirolf2009.samurai.gui.picker
 
 import com.sirolf2009.samurai.Samurai
 import java.time.LocalDate

@@ -10,11 +10,13 @@ import org.reflections.Reflections
 import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import com.sirolf2009.samurai.dataprovider.DataProvider
+import com.sirolf2009.samurai.optimizer.IOptimizer
 
 class Registered {
 
 	@Accessors static val List<Registration<IStrategy>> strategies = new ArrayList()
 	@Accessors static val List<Registration<DataProvider>> dataProviders = new ArrayList()
+	@Accessors static val List<Registration<IOptimizer>> optimizers = new ArrayList()
 
 	def static runRegistration() {
 		val reflections = new Reflections("", new SubTypesScanner(), new TypeAnnotationsScanner())
@@ -31,6 +33,12 @@ class Registered {
 			val annotation = (annotations.findFirst[annotationType == Register] as Register)
 			dataProviders.add(new Registration<DataProvider>(it as Class<? extends DataProvider>, annotation.name, annotation.type))
 		]
+		
+		optimizers.clear()
+		registeredClasses.filter[interfaces.findFirst[IOptimizer.isAssignableFrom(it)] != null].forEach [
+			val annotation = (annotations.findFirst[annotationType == Register] as Register)
+			optimizers.add(new Registration<IOptimizer>(it as Class<? extends IOptimizer>, annotation.name, annotation.type))
+		]
 	}
 	
 	@Data public static class Registration<E> {
@@ -38,6 +46,10 @@ class Registered {
 		Class<? extends E> clazz
 		String name
 		String type
+		
+		override toString() {
+			return name
+		}
 		
 	}
 

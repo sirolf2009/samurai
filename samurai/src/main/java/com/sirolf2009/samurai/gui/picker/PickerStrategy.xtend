@@ -1,11 +1,13 @@
-package com.sirolf2009.samurai.gui
+package com.sirolf2009.samurai.gui.picker
 
 import com.sirolf2009.samurai.Registered
+import com.sirolf2009.samurai.Registered.Registration
 import com.sirolf2009.samurai.Samurai
 import com.sirolf2009.samurai.strategy.IStrategy
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.value.ObservableBooleanValue
 import javafx.scene.control.TitledPane
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
@@ -23,28 +25,33 @@ class PickerStrategy extends TitledPane {
 	new() {
 		super("Strategy", null)
 		expanded = false
+		satisfiedProperty.bind(strategyProperty.notNull)
+		satisfiedProperty.addListener[
+			if((it as ObservableBooleanValue).get()) {
+				graphic = new ImageView(new Image(Samurai.getResourceAsStream("/ok.png")))
+			} else {
+				graphic = null
+			}
+		]
+		
 		content = new TreeView => [
 			root = new TreeItem("Strategy") => [root|
 				Registered.strategies.groupBy[type].entrySet.forEach[
 					val strategies = value
 					root.children += new TreeItem(key) => [type|
 						strategies.forEach[
-							type.children += new TreeItemStrategy(name, clazz.newInstance)
+							type.children += new TreeItem(it)
 						]
 					]
 				]
 			]
 			showRoot = false
 			selectionModel.selectedItemProperty.addListener [
-				val item = (it as ReadOnlyObjectProperty<TreeItem<String>>).value
-				if(item instanceof TreeItemStrategy) {
-					strategyProperty.set(item.strategy)
-					satisfiedProperty.set(true)
-					graphic = new ImageView(new Image(Samurai.getResourceAsStream("/ok.png")))
+				val item = (it as ReadOnlyObjectProperty<TreeItem<?>>).value
+				if(item.value instanceof Registration<?>) {
+					strategyProperty.set((item.value as Registration<IStrategy>).clazz.newInstance)
 				} else {
 					strategyProperty.set(null)
-					satisfiedProperty.set(false)
-					graphic = null
 				}
 			]
 			expandAllNodes

@@ -1,6 +1,10 @@
 package com.sirolf2009.samurai.gui
 
 import com.sirolf2009.samurai.dataprovider.DataProvider
+import com.sirolf2009.samurai.gui.picker.PickerDataprovider
+import com.sirolf2009.samurai.gui.picker.PickerParameters
+import com.sirolf2009.samurai.gui.picker.PickerStrategy
+import com.sirolf2009.samurai.gui.picker.PickerTimeframe
 import com.sirolf2009.samurai.strategy.IStrategy
 import javafx.beans.InvalidationListener
 import javafx.beans.property.SimpleObjectProperty
@@ -25,19 +29,23 @@ class SetupBacktest extends VBox {
 		pickerTimeframe = new PickerTimeframe()
 		pickerParameters = new PickerParameters(pickerStrategy.strategyProperty)
 
-		pickerDataProvider.satisfiedProperty.addListener [
-			pickerDataProvider.expanded = false
-			pickerStrategy.expanded = true
-			pickerTimeframe.expanded = false
-			pickerParameters.expanded = false
+		pickerDataProvider.providerProperty.addListener [
+			if(pickerDataProvider.satisfiedProperty.get) {
+				pickerDataProvider.expanded = false
+				pickerStrategy.expanded = true
+				pickerTimeframe.expanded = false
+				pickerParameters.expanded = false
+			}
 		]
-		pickerStrategy.satisfiedProperty.addListener [
-			pickerDataProvider.expanded = false
-			pickerStrategy.expanded = false
-			pickerTimeframe.expanded = true
-			pickerParameters.expanded = false
+		pickerStrategy.strategyProperty.addListener [
+			if(pickerStrategy.satisfiedProperty.get) {
+				pickerDataProvider.expanded = false
+				pickerStrategy.expanded = false
+				pickerTimeframe.expanded = true
+				pickerParameters.expanded = false
+			}
 		]
-		pickerTimeframe.satisfiedProperty.addListener [
+		pickerTimeframe.timeframeProperty.addListener [
 			pickerDataProvider.expanded = false
 			pickerStrategy.expanded = false
 			pickerTimeframe.expanded = false
@@ -48,7 +56,7 @@ class SetupBacktest extends VBox {
 
 		val InvalidationListener objectUpdater = [
 			if(pickerDataProvider.providerProperty.get != null && pickerStrategy.strategyProperty.get != null && pickerTimeframe.getTimeframeProperty.get != null) {
-				val provider = pickerDataProvider.providerProperty.get() => [
+				val provider = pickerDataProvider.providerProperty.get().get() => [
 					period = pickerTimeframe.periodProperty.get()
 					from = pickerTimeframe.fromProperty.get()
 					to = pickerTimeframe.toProperty.get()
