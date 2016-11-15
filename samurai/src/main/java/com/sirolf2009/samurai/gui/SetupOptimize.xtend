@@ -14,10 +14,11 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.Data
 import org.joda.time.DateTime
 import org.joda.time.Period
+import com.sirolf2009.samurai.optimizer.IOptimizer
 
-class SetupOptimize extends VBox {
+@Accessors class SetupOptimize extends VBox {
 
-	@Accessors val SimpleObjectProperty<OptimizeSetup> backtestSetupProperty = new SimpleObjectProperty<OptimizeSetup>(this, "backtestSetup")
+	val SimpleObjectProperty<OptimizeSetup> optimizeSetupProperty = new SimpleObjectProperty<OptimizeSetup>(this, "optimizeSetup")
 
 	val PickerDataprovider pickerDataProvider
 	val PickerStrategy pickerStrategy
@@ -76,9 +77,9 @@ class SetupOptimize extends VBox {
 					from = pickerTimeframe.fromProperty.get()
 					to = pickerTimeframe.toProperty.get()
 				]
-				backtestSetupProperty.set(new OptimizeSetup(provider, pickerStrategy.strategyProperty.get, pickerTimeframe.periodProperty.get, pickerTimeframe.fromProperty.get, pickerTimeframe.toProperty.get))
+				optimizeSetupProperty.set(new OptimizeSetup(provider, pickerStrategy.strategyProperty.get, pickerOptimizer.optimizerProperty.get(), pickerTimeframe.periodProperty.get, pickerTimeframe.fromProperty.get, pickerTimeframe.toProperty.get))
 			} else {
-				backtestSetupProperty.set(null)
+				optimizeSetupProperty.set(null)
 			}
 		]
 		pickerDataProvider.providerProperty.addListener(objectUpdater)
@@ -92,6 +93,7 @@ class SetupOptimize extends VBox {
 
 		DataProvider dataProvider
 		IStrategy strategy
+		IOptimizer optimizer
 		Period period
 		DateTime from
 		DateTime to

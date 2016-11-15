@@ -1,6 +1,5 @@
 package com.sirolf2009.samurai.tasks
 
-import com.sirolf2009.samurai.Samurai
 import com.sirolf2009.samurai.strategy.IStrategy
 import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.TradingRecord
@@ -9,12 +8,10 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 @Accessors class BackTest extends Task<TradingRecord> {
 
-	val Samurai samurai
 	val IStrategy strategy
 	val TimeSeries series
 
-	new(Samurai samurai, IStrategy strategy, TimeSeries series) {
-		this.samurai = samurai
+	new(IStrategy strategy, TimeSeries series) {
 		this.strategy = strategy
 		this.series = series
 	}

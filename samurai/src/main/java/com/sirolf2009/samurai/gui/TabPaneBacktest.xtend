@@ -58,7 +58,7 @@ class TabPaneBacktest extends TabPane {
 		new Thread(provider).start()
 
 		provider.onSucceeded = [
-			val backTest = new BackTest(samurai, strategy, it.source.value as TimeSeries)
+			val backTest = new BackTest(strategy, it.source.value as TimeSeries)
 
 			samurai.statusBar.task = backTest
 			backTest.onFailed = showErrorDialog

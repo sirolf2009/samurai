@@ -13,7 +13,7 @@ class PickerOptimizerParameters extends TitledPane {
 		
 		optimizerProperty.addListener[
 			val value = (it as ObjectProperty<? extends IOptimizer>).value
-			value.populateParameters(this, strategyProperty.get())
+			value.populateParameters(strategyProperty.get(), this)
 		]
 	}
 
