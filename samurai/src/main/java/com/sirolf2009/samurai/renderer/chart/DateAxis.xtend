@@ -24,11 +24,8 @@ import javafx.geometry.Bounds
 	static val WEEK_SPEC = new TickSpecification(WEEK, DateTimeFormat.forPattern("yyyy/MM/dd"), #[1, 2, 4])
 	static val MONTH_SPEC = new TickSpecification(MONTH, DateTimeFormat.forPattern("yyyy/MM"), #[1, 2, 3, 4, 6])
 
-	List<String> ticks
-	long tick
 	DateTime from
 	DateTime to
-	val Bounds bounds
 
 	def static DateAxis fromRange(DateTime from, DateTime to, Bounds bounds) {
 		val range = (to.millis - from.millis) / bounds.width * 400 // millis per 400 pixels
@@ -52,7 +49,7 @@ import javafx.geometry.Bounds
 		for (var i = from.millis; i < to.millis; i += tick) {
 			ticks.add(format.print(new DateTime(i)))
 		}
-		return new DateAxis(ticks, tick, from, to, bounds)
+		return new DateAxis(bounds, ticks, tick, from, to)
 	}
 
 	@Data static class TickSpecification {

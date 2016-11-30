@@ -9,6 +9,7 @@ import javafx.scene.canvas.GraphicsContext
 import static com.sirolf2009.samurai.renderer.chart.ChartSettings.*
 
 import static extension com.sirolf2009.samurai.renderer.chart.ChartData.*
+import javafx.geometry.BoundingBox
 
 class ChartIndicator extends Chart {
 
@@ -39,7 +40,7 @@ class ChartIndicator extends Chart {
 		} else {
 			val minPrice = indicator.min(startCandle, endCandle)
 			val maxPrice = indicator.max(startCandle, endCandle)
-			val axis = NumberAxis.fromRange(minPrice, maxPrice, canvas.height - X_AXIS_SIZE - AXIS_OFFSET)
+			val axis = NumberAxis.fromRange(minPrice, maxPrice, new BoundingBox(0, 0, Y_AXIS_SIZE, canvas.height - X_AXIS_SIZE - AXIS_OFFSET), true)
 
 			renderer.drawLineIndicator(axis, indicator, data.markers.filter[key == 0].map[value].toList(), g, panelWidth, canvas.height - X_AXIS_SIZE - AXIS_OFFSET, scrollX, scaleX, startCandle, endCandle)
 			translate(0, canvas.height - X_AXIS_SIZE - AXIS_OFFSET)

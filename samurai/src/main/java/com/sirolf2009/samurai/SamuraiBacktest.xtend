@@ -18,6 +18,9 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.CornerRadii
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
+import eu.verdelhan.ta4j.TimeSeries
+import com.sirolf2009.samurai.tasks.BackTest
+import eu.verdelhan.ta4j.TradingRecord
 
 class SamuraiBacktest extends BorderPane {
 
@@ -35,7 +38,18 @@ class SamuraiBacktest extends BorderPane {
 				disableProperty.bind(setup.backtestSetupProperty.^null)
 				onAction = [
 					val backtestSetup = setup.backtestSetupProperty.get()
-					backtests.tabs += new Tab(backtestSetup.strategy.class.simpleName, new TabPaneBacktest(samurai, backtestSetup.dataProvider, backtestSetup.strategy))
+					samurai.statusBar.task = backtestSetup.dataProvider
+					new Thread(backtestSetup.dataProvider).start()
+					backtestSetup.dataProvider.onSucceeded = [
+						val timeSeries = it.source.value as TimeSeries
+						val backTest = new BackTest(backtestSetup.strategy, timeSeries)
+
+						samurai.statusBar.task = backTest
+						backTest.onSucceeded = [
+							backtests.tabs += new Tab(backtestSetup.strategy.class.simpleName, new TabPaneBacktest(backtestSetup.strategy, source.value as TradingRecord, timeSeries))
+						]
+						new Thread(backTest).start()
+					]
 				]
 			]
 		))

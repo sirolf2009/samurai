@@ -45,7 +45,7 @@ class PickerTimeframe extends TitledPane {
 			val cal = Calendar.instance
 			padding = new Insets(4)
 			add(new Label("From"), 0, 0)
-			add(new DatePicker(LocalDate.ofYearDay(cal.get(Calendar.YEAR), 1)) => [
+			add(new DatePicker(LocalDate.ofYearDay(cal.get(Calendar.YEAR)-20, 1)) => [
 				onAction = [fromProperty.set(new DateTime((source as DatePicker).value.atStartOfDay(ZoneId.systemDefault).toEpochSecond() * 1000))]
 			], 1, 0)
 			add(new Label("To"), 0, 1)
@@ -53,7 +53,7 @@ class PickerTimeframe extends TitledPane {
 				onAction = [toProperty.set(new DateTime((source as DatePicker).value.atStartOfDay(ZoneId.systemDefault).toEpochSecond() * 1000))]
 			], 1, 1)
 
-			fromProperty.set(new DateTime(cal.get(Calendar.YEAR) - 1, 1, 1, 1, 0))
+			fromProperty.set(new DateTime(cal.get(Calendar.YEAR) - 20, 1, 1, 1, 0))
 			toProperty.set(new DateTime(cal.get(Calendar.YEAR), 1, 1, 1, 0))
 		]
 		root.children += new Separator(Orientation.HORIZONTAL)

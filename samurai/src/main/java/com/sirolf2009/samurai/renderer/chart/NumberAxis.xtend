@@ -2,23 +2,20 @@ package com.sirolf2009.samurai.renderer.chart
 
 import java.text.DecimalFormat
 import java.util.ArrayList
-import java.util.List
 import org.eclipse.xtend.lib.annotations.Data
+import javafx.geometry.Bounds
 
 @Data class NumberAxis extends Axis {
 
-	List<String> ticks
-	double tick
 	double minValueData
 	double maxValueData
 	double minValue
 	double maxValue
-	double panelSize
 	boolean isVertical
 	
 	def map(double value) {
 		val valueToAxis = if(minValueData < minValue) map(value, minValueData, maxValueData, minValue, maxValue) else value
-		val valueOnChart = map(valueToAxis, minValue, maxValue, 0, if(isVertical) -panelSize else panelSize)
+		val valueOnChart = map(valueToAxis, minValue, maxValue, 0, if(isVertical) -bounds.height else bounds.width)
 		valueOnChart
 	}
 
@@ -26,20 +23,20 @@ import org.eclipse.xtend.lib.annotations.Data
 		return out_min + ((out_max - out_min) / (in_max - in_min)) * (x - in_min)
 	}
 
-	def static NumberAxis fromRange(double minValueUgly, double maxValue, double length) {
-		return fromRange(minValueUgly, maxValue, length, 32)
+	def static NumberAxis fromRange(double minValueUgly, double maxValue, Bounds bounds, boolean isVertical) {
+		return fromRange(minValueUgly, maxValue, bounds, isVertical, 32)
 	}
 
-	def static NumberAxis fromRange(double minValueUgly, double maxValue, double length, double labels) {
+	def static NumberAxis fromRange(double minValueUgly, double maxValue, Bounds bounds, boolean isVertical, double labels) {
 		val minValue = if(minValueUgly.pretty() < maxValue) minValueUgly.pretty() else minValueUgly
 		val range = (maxValue - minValue)
 		
 		if(range == 0) {
-			return fromRange(minValueUgly - 1, maxValue+1, length, labels)
+			return fromRange(minValueUgly - 1, maxValue+1, bounds, isVertical, labels)
 		}
 		
 		val exponent = Math.log10(range)
-		val unroundedTickSize = range / (((length / labels) as int) - 1)
+		val unroundedTickSize = range / ((((if(isVertical) bounds.height else bounds.width) / labels) as int) - 1)
 		val x = Math.ceil(Math.log10(unroundedTickSize) - 1)
 		val pow10x = Math.pow(10, x)
 		val roundedTickRange = Math.ceil(unroundedTickSize / pow10x) * pow10x
@@ -65,7 +62,9 @@ import org.eclipse.xtend.lib.annotations.Data
 		for (var i = minValue; i < maxValue; i += roundedTickRange) {
 			ticks.add(formatter.format(i))
 		}
-		return new NumberAxis(ticks, roundedTickRange, minValueUgly, maxValue, minValue, maxValue, length, true)
+		
+  //Bounds bounds, final List<String> ticks, final double tick, final double minValueData, final double maxValueData, final double minValue, final double maxValue, final double panelSize, final boolean isVertical) {
+		return new NumberAxis(bounds, ticks, roundedTickRange, minValueUgly, maxValue, minValue, maxValue, isVertical)
 	}
 	
 	def static pretty(double value) {

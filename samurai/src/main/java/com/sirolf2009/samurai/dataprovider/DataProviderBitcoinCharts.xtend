@@ -60,5 +60,12 @@ class DataProviderBitcoinCharts extends DataProvider {
 			super(new File("data/bitstampUSD.csv"))
 		}
 	}
+	
+	@Register(name="Bitfinex USD", type="Built-In")
+	public static class DataproviderBitfinexUSD extends DataProviderBitcoinCharts {
+		new() {
+			super(new File("data/bitfinexUSD.csv"))
+		}
+	}
 
 }

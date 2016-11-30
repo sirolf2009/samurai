@@ -3,7 +3,7 @@ package com.sirolf2009.samurai.renderer
 import com.sirolf2009.samurai.criterion.AbsoluteProfitCriterion
 import com.sirolf2009.samurai.criterion.BiggestPendingLossCriterion
 import com.sirolf2009.samurai.criterion.BiggestPendingProfitCriterion
-import com.sirolf2009.samurai.renderer.chart.DateAxis
+import com.sirolf2009.samurai.renderer.chart.Axis
 import com.sirolf2009.samurai.renderer.chart.Marker
 import com.sirolf2009.samurai.renderer.chart.NumberAxis
 import eu.verdelhan.ta4j.Decimal
@@ -11,6 +11,7 @@ import eu.verdelhan.ta4j.Indicator
 import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.TradingRecord
 import java.util.List
+import javafx.geometry.Point2D
 import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
@@ -71,27 +72,27 @@ class RendererDefault implements IRenderer {
 		g.save()
 		g.translate(Y_AXIS_SIZE + (AXIS_OFFSET / 2), height - (AXIS_OFFSET / 2))
 		g.scale(scaleX, 1)
-		
-		val profitCrit = new AbsoluteProfitCriterion() 
+
+		val profitCrit = new AbsoluteProfitCriterion()
 		val pendingLossCrit = new BiggestPendingLossCriterion()
 		val pendingProfitCrit = new BiggestPendingProfitCriterion()
 
 		candles.forEach [ candle, index |
 			record.trades.filter[entry.index == startCandle + index].forEach [
 				g.save()
-				val tradeWidth = (exit.index-entry.index)*(WIDTH_TICK)
+				val tradeWidth = (exit.index - entry.index) * (WIDTH_TICK)
 				val entryOnChart = axis.map(entry.price.toDouble())
 				val exitOnChart = axis.map(exit.price.toDouble)
 				val profit = profitCrit.calculate(series, it)
 				val pendingLoss = pendingLossCrit.calculate(series, it)
 				val pendingProfit = pendingProfitCrit.calculate(series, it)
-				
+
 				g.fill = new Color(1, 0, 0, 0.25)
-				g.fillRect(0, entryOnChart, tradeWidth, Math.abs(axis.map(entry.price.toDouble())-axis.map(entry.price.toDouble()-pendingLoss)))
+				g.fillRect(0, entryOnChart, tradeWidth, Math.abs(axis.map(entry.price.toDouble()) - axis.map(entry.price.toDouble() - pendingLoss)))
 				g.fill = new Color(0, 1, 0, 0.25)
-				g.fillRect(0, axis.map(entry.price.toDouble()+pendingProfit), tradeWidth, axis.map(entry.price.toDouble())-axis.map(entry.price.toDouble()+pendingProfit))
+				g.fillRect(0, axis.map(entry.price.toDouble() + pendingProfit), tradeWidth, axis.map(entry.price.toDouble()) - axis.map(entry.price.toDouble() + pendingProfit))
 				g.fill = if(profit > 0) new Color(0, 1, 0, 0.5) else new Color(1, 0, 0, 0.5)
-				g.fillRect(0, Math.min(entryOnChart, exitOnChart), tradeWidth, Math.abs(exitOnChart-entryOnChart))
+				g.fillRect(0, Math.min(entryOnChart, exitOnChart), tradeWidth, Math.abs(exitOnChart - entryOnChart))
 				g.restore()
 			]
 
@@ -140,22 +141,39 @@ class RendererDefault implements IRenderer {
 		drawIndicatorName(indicator, g)
 	}
 
+	def drawScatterPlot(NumberAxis axisY, NumberAxis axisX, List<Point2D> vectors, GraphicsContext g, double width, double height) {
+		g.save()
+		g.translate(Y_AXIS_SIZE + (AXIS_OFFSET / 2), height - (AXIS_OFFSET / 2))
+		g.setStroke(Color.CYAN)
+		g.fill = Color.CYAN
+		vectors.forEach [ tick, index |
+			if(tick != null) {
+				g.fillOval(axisX.map(tick.x)-1, axisY.map(tick.y)-1, 3, 3)
+			}
+		]
+		g.restore()
+
+		axisY.drawYAxis(g)
+	}
+
 	def drawIndicatorName(Indicator<?> indicator, GraphicsContext g) {
 		g.fillText(indicator.toString(), Y_AXIS_SIZE + 2, g.font.size + 2)
 	}
 
 	def drawYAxis(NumberAxis axis, GraphicsContext g) {
 		g.fill = Color.WHITE
-		g.fillRect(Y_AXIS_SIZE - 1, 0, 1, axis.panelSize)
+		g.fillRect(Y_AXIS_SIZE, 0, 1, axis.bounds.height)
+		g.textAlign = TextAlignment.LEFT
+		g.textBaseline = VPos.CENTER
 
 		axis.ticks.forEach [ tick, index |
 			val text = new Text(tick)
-			g.fillText(tick, 0, axis.panelSize - (axis.panelSize / axis.ticks.size * index) + text.layoutBounds.height / 2, Y_AXIS_SIZE - 12)
-			g.fillRect(Y_AXIS_SIZE - 10, axis.panelSize - (axis.panelSize / axis.ticks.size * index), 10, 1)
+			g.fillText(tick, 0, axis.bounds.height - (axis.bounds.height / axis.ticks.size * index) + text.layoutBounds.height / 2, Y_AXIS_SIZE - 12)
+			g.fillRect(Y_AXIS_SIZE - 10, axis.bounds.height - (axis.bounds.height / axis.ticks.size * index), 10, 1)
 		]
 	}
 
-	override drawXAxis(DateAxis axis, GraphicsContext g) {
+	override drawXAxis(Axis axis, GraphicsContext g) {
 		g.fill = Color.WHITE
 		g.fillRect(Y_AXIS_SIZE, -1, axis.bounds.width, 1)
 
@@ -163,7 +181,7 @@ class RendererDefault implements IRenderer {
 		g.textAlign = TextAlignment.CENTER
 		g.textBaseline = VPos.CENTER
 		axis.ticks.forEach [ tick, index |
-			val x = (axis.bounds.width / axis.ticks.size * index) + Y_AXIS_SIZE + WIDTH_TICK/2
+			val x = (axis.bounds.width / axis.ticks.size * index) + Y_AXIS_SIZE + WIDTH_TICK / 2
 			g.fillText(tick, x, size + 12)
 			g.fillRect(x, 0, 1, 10)
 		]

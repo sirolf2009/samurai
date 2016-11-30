@@ -10,6 +10,7 @@ import javafx.scene.paint.Color
 import static com.sirolf2009.samurai.renderer.chart.ChartSettings.*
 
 import static extension com.sirolf2009.samurai.renderer.chart.ChartData.*
+import javafx.geometry.BoundingBox
 
 class ChartPrice extends Chart {
 
@@ -48,7 +49,7 @@ class ChartPrice extends Chart {
 					val panelHeight = heightPerPanel * 2 - AXIS_OFFSET
 					val minPrice = if(data.indicatorsInPanel(0).size > 0) Math.min(data.min(startCandle, endCandle), data.min(0, startCandle, endCandle)) else data.min(startCandle, endCandle)
 					val maxPrice = if(data.indicatorsInPanel(0).size > 0) Math.max(data.max(startCandle, endCandle), data.max(0, startCandle, endCandle)) else data.max(startCandle, endCandle)
-					val axis = NumberAxis.fromRange(minPrice, maxPrice, panelHeight)
+					val axis = NumberAxis.fromRange(minPrice, maxPrice, new BoundingBox(0, 0, Y_AXIS_SIZE, panelHeight), true)
 
 					renderer.drawTimeseries(axis, data.timeseries, data.markers.filter[key == 0].map[value].toList(), g, canvas.width, heightPerPanel * 2, scrollX, scaleX, startCandle, endCandle)
 					data.indicatorsInPanel(0).forEach [
@@ -66,7 +67,7 @@ class ChartPrice extends Chart {
 						val panelHeight = heightPerPanel - AXIS_OFFSET
 						val minPrice = data.indicatorsInPanel(panel).min(startCandle, endCandle)
 						val maxPrice = data.indicatorsInPanel(panel).max(startCandle, endCandle)
-						val axis = NumberAxis.fromRange(minPrice, maxPrice, panelHeight)
+						val axis = NumberAxis.fromRange(minPrice, maxPrice, new BoundingBox(0, 0, Y_AXIS_SIZE, panelHeight), true)
 						data.indicatorsInPanel(panel).forEach [
 							renderer.drawLineIndicator(axis, it, new ArrayList(), g, canvas.width, heightPerPanel, scrollX, scaleX, startCandle, endCandle)
 						]
