@@ -53,7 +53,7 @@ class DataProviderBitcoinCharts extends DataProvider {
 
 		return new TimeSeries(name, ticks)
 	}
-	
+
 	@Register(name="Bitstamp USD", type="Built-In")
 	public static class DataproviderBitstampUSD extends DataProviderBitcoinCharts {
 		new() {

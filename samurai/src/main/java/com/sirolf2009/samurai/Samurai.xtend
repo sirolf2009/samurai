@@ -23,7 +23,7 @@ import static extension xtendfx.scene.SceneBuilder.*
 		BorderedScene[
 			root = it
 			top = new SamuraiMenuBar(this)
-			center = new SamuraiOptimize(this)
+			center = new SamuraiBacktest(this)
 			bottom = statusBar
 		]
 		title = "Samurai"

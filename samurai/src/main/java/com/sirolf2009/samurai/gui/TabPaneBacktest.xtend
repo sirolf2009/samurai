@@ -40,11 +40,13 @@ import javafx.util.Callback
 import xtendfx.beans.FXBindable
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
+import eu.verdelhan.ta4j.analysis.criteria.TotalProfitCriterion
+import eu.verdelhan.ta4j.analysis.criteria.RewardRiskRatioCriterion
+import eu.verdelhan.ta4j.analysis.criteria.BuyAndHoldCriterion
 
 class TabPaneBacktest extends TabPane {
 
 	static val moneyFormat = new DecimalFormat("$###,###,###,##0.00")
-
 	var Chart chart
 
 	new(IStrategy strategy, TradingRecord tradingRecord, TimeSeries series) {
@@ -63,14 +65,16 @@ class TabPaneBacktest extends TabPane {
 				details.add(getLabel.apply(value + ""), 1, row)
 			]
 
-			addDetail.apply(0, "Net profit", moneyFormat.format(new AbsoluteProfitCriterion().calculate(series, tradingRecord)))
+			addDetail.apply(0, "Net profit", new TotalProfitCriterion().calculate(series, tradingRecord))
 			addDetail.apply(1, "# Trades", new NumberOfTradesCriterion().calculate(series, tradingRecord) as int)
 			addDetail.apply(2, "% Profitable", new AverageProfitableTradesCriterion().calculate(series, tradingRecord) * 100)
-			addDetail.apply(3, "Max drawdown", moneyFormat.format(new MaximumDrawdownCriterion().calculate(series, tradingRecord)))
-			addDetail.apply(4, "Average profit per trade", moneyFormat.format(new AverageProfitCriterion().calculate(series, tradingRecord)))
+			addDetail.apply(3, "Max drawdown", new MaximumDrawdownCriterion().calculate(series, tradingRecord))
+			addDetail.apply(4, "Average profit per trade", new AverageProfitCriterion().calculate(series, tradingRecord))
+			addDetail.apply(5, "Reward risk ratio", new RewardRiskRatioCriterion().calculate(series, tradingRecord))
+			addDetail.apply(6, "Buy and Hold ratio", new BuyAndHoldCriterion().calculate(series, tradingRecord))
 
 			details.showGridLines()
-			details.stretchGrid(1, 4)
+			details.stretchGrid(1, 6)
 
 			val container = new AnchorPane(details) => [
 				minWidth = 0

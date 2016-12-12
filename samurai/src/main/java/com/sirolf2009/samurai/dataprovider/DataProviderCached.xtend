@@ -36,7 +36,7 @@ abstract class DataProviderCached extends DataProvider {
 	}
 
 	def loadAndCombine(Period periodData, Period periodCombined) throws Exception {
-		val TimeSeries series = new TimeSeries(name, periodCombined)
+		val TimeSeries series = new TimeSeries(name)
 		val zero = new DateTime(0)
 		val millis = periodData.toDurationFrom(zero).getMillis()
 		val startIndeces = new ArrayList()
