@@ -1,7 +1,8 @@
 package com.sirolf2009.samurai.optimizer
 
 import com.sirolf2009.samurai.annotations.Register
-import com.sirolf2009.samurai.criterion.AbsoluteProfitCriterion
+import com.sirolf2009.samurai.gui.DoubleRangeSpinner
+import com.sirolf2009.samurai.gui.DoubleRangeSpinner.DoubleRange
 import com.sirolf2009.samurai.gui.IntegerRangeSpinner
 import com.sirolf2009.samurai.gui.IntegerRangeSpinner.IntegerRange
 import com.sirolf2009.samurai.gui.SamuraiStatusBar
@@ -11,6 +12,7 @@ import com.sirolf2009.samurai.strategy.IStrategy
 import com.sirolf2009.samurai.strategy.Param
 import com.sirolf2009.samurai.tasks.BackTest
 import eu.verdelhan.ta4j.TimeSeries
+import eu.verdelhan.ta4j.analysis.criteria.TotalProfitCriterion
 import java.beans.PropertyDescriptor
 import java.util.ArrayList
 import java.util.List
@@ -30,8 +32,6 @@ import org.controlsfx.property.editor.DefaultPropertyEditorFactory
 import org.controlsfx.property.editor.Editors
 import org.controlsfx.property.editor.PropertyEditor
 import org.eclipse.xtend.lib.annotations.Accessors
-import com.sirolf2009.samurai.gui.DoubleRangeSpinner
-import com.sirolf2009.samurai.gui.DoubleRangeSpinner.DoubleRange
 
 @Register(name="Brute Force", type="Built-In")
 class OptimizerBruteForce implements IOptimizer {
@@ -80,7 +80,8 @@ class OptimizerBruteForce implements IOptimizer {
 					val backtest = new BackTest(setup.strategy, data)
 					new Thread(backtest).start()
 					backtest.get() => [
-						val profit = new AbsoluteProfitCriterion().calculate(data, it)
+						val criterion = new TotalProfitCriterion()
+						val profit = criterion.calculate(data, it)
 						parameters.add(0, profit + "")
 						table.items.add(parameters)
 					]

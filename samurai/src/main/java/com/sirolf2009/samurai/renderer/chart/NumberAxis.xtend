@@ -63,7 +63,6 @@ import javafx.geometry.Bounds
 			ticks.add(formatter.format(i))
 		}
 		
-  //Bounds bounds, final List<String> ticks, final double tick, final double minValueData, final double maxValueData, final double minValue, final double maxValue, final double panelSize, final boolean isVertical) {
 		return new NumberAxis(bounds, ticks, roundedTickRange, minValueUgly, maxValue, minValue, maxValue, isVertical)
 	}
 	

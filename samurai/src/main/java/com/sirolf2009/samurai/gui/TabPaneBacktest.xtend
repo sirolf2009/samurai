@@ -9,11 +9,14 @@ import com.sirolf2009.samurai.renderer.chart.ChartIndicator
 import com.sirolf2009.samurai.renderer.chart.ChartPrice
 import com.sirolf2009.samurai.strategy.IStrategy
 import eu.verdelhan.ta4j.TimeSeries
-import eu.verdelhan.ta4j.TradingRecord
+import eu.verdelhan.ta4j.TradesRecord
 import eu.verdelhan.ta4j.analysis.criteria.AverageProfitCriterion
 import eu.verdelhan.ta4j.analysis.criteria.AverageProfitableTradesCriterion
+import eu.verdelhan.ta4j.analysis.criteria.BuyAndHoldCriterion
 import eu.verdelhan.ta4j.analysis.criteria.MaximumDrawdownCriterion
 import eu.verdelhan.ta4j.analysis.criteria.NumberOfTradesCriterion
+import eu.verdelhan.ta4j.analysis.criteria.RewardRiskRatioCriterion
+import eu.verdelhan.ta4j.analysis.criteria.TotalProfitCriterion
 import java.text.DecimalFormat
 import java.util.ArrayList
 import javafx.application.Platform
@@ -40,16 +43,13 @@ import javafx.util.Callback
 import xtendfx.beans.FXBindable
 
 import static extension com.sirolf2009.samurai.util.GUIUtil.*
-import eu.verdelhan.ta4j.analysis.criteria.TotalProfitCriterion
-import eu.verdelhan.ta4j.analysis.criteria.RewardRiskRatioCriterion
-import eu.verdelhan.ta4j.analysis.criteria.BuyAndHoldCriterion
 
 class TabPaneBacktest extends TabPane {
 
 	static val moneyFormat = new DecimalFormat("$###,###,###,##0.00")
 	var Chart chart
 
-	new(IStrategy strategy, TradingRecord tradingRecord, TimeSeries series) {
+	new(IStrategy strategy, TradesRecord tradingRecord, TimeSeries series) {
 		background = new Background(new BackgroundFill(Color.WHITESMOKE, CornerRadii.EMPTY, Insets.EMPTY))
 
 		new Tab("Details") => [
@@ -184,7 +184,7 @@ class TabPaneBacktest extends TabPane {
 			table.columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
 
 			val profitCalc = new AbsoluteProfitCriterion()
-			tradingRecord.trades.forEach [ trade, index |
+			tradingRecord.sortWith[a,b|a.entry.index.compareTo(b.entry.index)].forEach [ trade, index |
 				table.items.add(new TableTrade() => [
 					nr = index + ""
 					direction = if(trade.entry.buy) "LONG" else "SHORT"

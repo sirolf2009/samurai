@@ -10,6 +10,7 @@ import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator
 import eu.verdelhan.ta4j.trading.rules.CrossedDownIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.CrossedUpIndicatorRule
 import org.eclipse.xtend.lib.annotations.Accessors
+import java.util.Optional
 
 @Register(name="SMA crossover", type="Built-In")
 class StrategySMACrossover implements IStrategy {
@@ -24,7 +25,7 @@ class StrategySMACrossover implements IStrategy {
 	@Param @Accessors var int longPeriod = 30
 
 	// if this confuses you, you should read the TA4J documentation. Not mine	
-	override setup(TimeSeries series) {
+	override setupLongingStrategy(TimeSeries series) {
 		val closePrice = new ClosePriceIndicator(series)
 
         shortSma = new SMAIndicator(closePrice, shortPeriod)
@@ -33,7 +34,19 @@ class StrategySMACrossover implements IStrategy {
         val buyingRule = new CrossedUpIndicatorRule(shortSma, longSma)
         val sellingRule = new CrossedDownIndicatorRule(shortSma, longSma)
         
-        return new Strategy(buyingRule, sellingRule)
+        return Optional.of(new Strategy(buyingRule, sellingRule))
+	}
+	
+	override setupShortingStrategy(TimeSeries series) {
+		val closePrice = new ClosePriceIndicator(series)
+
+        shortSma = new SMAIndicator(closePrice, shortPeriod)
+        longSma = new SMAIndicator(closePrice, longPeriod)
+
+        val shortingRule = new CrossedDownIndicatorRule(shortSma, longSma)
+        val coveringRule = new CrossedUpIndicatorRule(shortSma, longSma)
+        
+        return Optional.of(new Strategy(shortingRule, coveringRule))
 	}
 	
 	// We want to add both our indicators to the 0th panel, which is the price panel

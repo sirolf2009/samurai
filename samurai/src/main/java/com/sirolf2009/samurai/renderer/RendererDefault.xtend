@@ -9,7 +9,7 @@ import com.sirolf2009.samurai.renderer.chart.NumberAxis
 import eu.verdelhan.ta4j.Decimal
 import eu.verdelhan.ta4j.Indicator
 import eu.verdelhan.ta4j.TimeSeries
-import eu.verdelhan.ta4j.TradingRecord
+import eu.verdelhan.ta4j.TradesRecord
 import java.util.List
 import javafx.geometry.Point2D
 import javafx.geometry.VPos
@@ -66,7 +66,7 @@ class RendererDefault implements IRenderer {
 		g.restore()
 	}
 
-	def drawTrades(NumberAxis axis, TimeSeries series, TradingRecord record, GraphicsContext g, double width, double height, int x, double scaleX, int startCandle, int endCandle) {
+	def drawTrades(NumberAxis axis, TimeSeries series, TradesRecord record, GraphicsContext g, double width, double height, int x, double scaleX, int startCandle, int endCandle) {
 		val candles = (startCandle .. endCandle).map[series.getTick(it)].toList()
 
 		g.save()
@@ -78,7 +78,7 @@ class RendererDefault implements IRenderer {
 		val pendingProfitCrit = new BiggestPendingProfitCriterion()
 
 		candles.forEach [ candle, index |
-			record.trades.filter[entry.index == startCandle + index].forEach [
+			record.filter[entry.index == startCandle + index].forEach [
 				g.save()
 				val tradeWidth = (exit.index - entry.index) * (WIDTH_TICK)
 				val entryOnChart = axis.map(entry.price.toDouble())
@@ -87,12 +87,21 @@ class RendererDefault implements IRenderer {
 				val pendingLoss = pendingLossCrit.calculate(series, it)
 				val pendingProfit = pendingProfitCrit.calculate(series, it)
 
-				g.fill = new Color(1, 0, 0, 0.25)
-				g.fillRect(0, entryOnChart, tradeWidth, Math.abs(axis.map(entry.price.toDouble()) - axis.map(entry.price.toDouble() - pendingLoss)))
-				g.fill = new Color(0, 1, 0, 0.25)
-				g.fillRect(0, axis.map(entry.price.toDouble() + pendingProfit), tradeWidth, axis.map(entry.price.toDouble()) - axis.map(entry.price.toDouble() + pendingProfit))
-				g.fill = if(profit > 0) new Color(0, 1, 0, 0.5) else new Color(1, 0, 0, 0.5)
-				g.fillRect(0, Math.min(entryOnChart, exitOnChart), tradeWidth, Math.abs(exitOnChart - entryOnChart))
+				if(entry.buy) {
+					g.fill = new Color(1, 0, 0, 0.25) // Pending Loss
+					g.fillRect(0, entryOnChart, tradeWidth, Math.abs(axis.map(entry.price.toDouble()) - axis.map(entry.price.toDouble() - pendingLoss)))
+					g.fill = new Color(0, 1, 0, 0.25) // Pending Profit
+					g.fillRect(0, axis.map(entry.price.toDouble() + pendingProfit), tradeWidth, axis.map(entry.price.toDouble()) - axis.map(entry.price.toDouble() + pendingProfit))
+					g.fill = if(profit > 0) new Color(0, 1, 0, 0.5) else new Color(1, 0, 0, 0.5) // Profit
+					g.fillRect(0, Math.min(entryOnChart, exitOnChart), tradeWidth, Math.abs(exitOnChart - entryOnChart))
+				} else {
+					g.fill = new Color(1, 0, 0, 0.25) // Pending Loss
+					g.fillRect(0, axis.map(entry.price.toDouble() + pendingLoss), tradeWidth, Math.abs(axis.map(entry.price.toDouble()) - axis.map(entry.price.toDouble()+pendingLoss)))
+					g.fill = new Color(0, 1, 0, 0.25) // Pending Profit
+					g.fillRect(0, entryOnChart, tradeWidth, Math.abs(axis.map(entry.price.toDouble()) - axis.map(entry.price.toDouble() - pendingProfit)))
+					g.fill = if(profit > 0) new Color(0, 1, 0, 0.5) else new Color(1, 0, 0, 0.5) // Profit
+					g.fillRect(0, Math.min(entryOnChart, exitOnChart), tradeWidth, Math.abs(exitOnChart - entryOnChart))
+				}
 				g.restore()
 			]
 
@@ -148,7 +157,7 @@ class RendererDefault implements IRenderer {
 		g.fill = Color.CYAN
 		vectors.forEach [ tick, index |
 			if(tick != null) {
-				g.fillOval(axisX.map(tick.x)-1, axisY.map(tick.y)-1, 3, 3)
+				g.fillOval(axisX.map(tick.x) - 1, axisY.map(tick.y) - 1, 3, 3)
 			}
 		]
 		g.restore()

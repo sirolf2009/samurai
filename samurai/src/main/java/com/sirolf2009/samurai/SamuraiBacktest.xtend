@@ -2,6 +2,9 @@ package com.sirolf2009.samurai
 
 import com.sirolf2009.samurai.gui.SetupBacktest
 import com.sirolf2009.samurai.gui.TabPaneBacktest
+import com.sirolf2009.samurai.tasks.BackTest
+import eu.verdelhan.ta4j.Portfolio
+import eu.verdelhan.ta4j.TimeSeries
 import javafx.geometry.Insets
 import javafx.scene.control.Button
 import javafx.scene.control.ScrollPane
@@ -18,9 +21,6 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.CornerRadii
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
-import eu.verdelhan.ta4j.TimeSeries
-import com.sirolf2009.samurai.tasks.BackTest
-import eu.verdelhan.ta4j.TradingRecord
 
 class SamuraiBacktest extends BorderPane {
 
@@ -46,7 +46,7 @@ class SamuraiBacktest extends BorderPane {
 
 						samurai.statusBar.task = backTest
 						backTest.onSucceeded = [
-							backtests.tabs += new Tab(backtestSetup.strategy.class.simpleName, new TabPaneBacktest(backtestSetup.strategy, source.value as TradingRecord, timeSeries))
+							backtests.tabs += new Tab(backtestSetup.strategy.class.simpleName, new TabPaneBacktest(backtestSetup.strategy, source.value as Portfolio, timeSeries))
 						]
 						new Thread(backTest).start()
 					]

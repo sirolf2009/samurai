@@ -14,6 +14,7 @@ import eu.verdelhan.ta4j.trading.rules.CrossedUpIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.OverIndicatorRule
 import eu.verdelhan.ta4j.trading.rules.UnderIndicatorRule
 import org.eclipse.xtend.lib.annotations.Accessors
+import java.util.Optional
 
 @Register(name="Moving momentum", type="Built-In")
 class StrategyMovingMomentum implements IStrategy {
@@ -35,7 +36,7 @@ class StrategyMovingMomentum implements IStrategy {
 	@Accessors @Param var int macdSmooth = 18
 	
 	// if this confuses you, you should read the TA4J documentation. Not mine	
-	override setup(TimeSeries series) {
+	override setupLongingStrategy(TimeSeries series) {
         val closePrice = new ClosePriceIndicator(series)
         
         shortEma = new EMAIndicator(closePrice, shortPeriod)
@@ -54,7 +55,7 @@ class StrategyMovingMomentum implements IStrategy {
                 .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(80)))
                 .and(new UnderIndicatorRule(macd, emaMacd))
         
-        return new Strategy(entryRule, exitRule)
+        return Optional.of(new Strategy(entryRule, exitRule))
 	}
 	
 	// Here we set up our indicators

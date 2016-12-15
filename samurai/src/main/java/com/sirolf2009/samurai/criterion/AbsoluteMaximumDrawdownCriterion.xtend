@@ -1,16 +1,16 @@
 package com.sirolf2009.samurai.criterion
 
-import eu.verdelhan.ta4j.analysis.criteria.AbstractAnalysisCriterion
-import eu.verdelhan.ta4j.TimeSeries
-import eu.verdelhan.ta4j.TradingRecord
-import eu.verdelhan.ta4j.Decimal
-import eu.verdelhan.ta4j.Trade
 import com.sirolf2009.samurai.indicator.IndicatorAbsoluteCashFlow
+import eu.verdelhan.ta4j.Decimal
+import eu.verdelhan.ta4j.TimeSeries
+import eu.verdelhan.ta4j.Trade
+import eu.verdelhan.ta4j.TradesRecord
+import eu.verdelhan.ta4j.analysis.criteria.AbstractAnalysisCriterion
 
 class AbsoluteMaximumDrawdownCriterion extends AbstractAnalysisCriterion {
 
-	override calculate(TimeSeries series, TradingRecord tradingRecord) {
-		val cashFlow = new IndicatorAbsoluteCashFlow(series, tradingRecord)
+	override calculate(TimeSeries series, TradesRecord tradesRecord) {
+		val cashFlow = new IndicatorAbsoluteCashFlow(series, tradesRecord)
 		val maximumDrawdown = calculateMaximumDrawdown(series, cashFlow)
 		return maximumDrawdown.toDouble()
 	}

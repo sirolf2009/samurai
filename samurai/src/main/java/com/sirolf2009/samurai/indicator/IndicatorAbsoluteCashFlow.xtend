@@ -4,7 +4,7 @@ import eu.verdelhan.ta4j.Decimal
 import eu.verdelhan.ta4j.Indicator
 import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.Trade
-import eu.verdelhan.ta4j.TradingRecord
+import eu.verdelhan.ta4j.TradesRecord
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.Collections
@@ -21,9 +21,9 @@ class IndicatorAbsoluteCashFlow implements Indicator<Decimal> {
 		fillToTheEnd()
 	}
 	
-	new(TimeSeries timeSeries, TradingRecord tradingRecord) {
+	new(TimeSeries timeSeries, TradesRecord tradingRecord) {
 		this.timeSeries = timeSeries
-		tradingRecord.trades.forEach[calculate(it)]
+		tradingRecord.forEach[calculate(it)]
 		fillToTheEnd()
 	}
 	

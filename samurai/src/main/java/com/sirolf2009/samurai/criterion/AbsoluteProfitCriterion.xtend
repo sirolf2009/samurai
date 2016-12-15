@@ -2,16 +2,16 @@ package com.sirolf2009.samurai.criterion
 
 import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.Trade
-import eu.verdelhan.ta4j.TradingRecord
+import eu.verdelhan.ta4j.TradesRecord
 import eu.verdelhan.ta4j.analysis.criteria.AbstractAnalysisCriterion
 
 class AbsoluteProfitCriterion extends AbstractAnalysisCriterion {
 	
-	override calculate(TimeSeries series, TradingRecord tradingRecord) {
-		if(tradingRecord.trades.size == 0) {
+	override calculate(TimeSeries series, TradesRecord tradingRecord) {
+		if(tradingRecord.tradeCount == 0) {
 			return 0
 		}
-        return tradingRecord.trades.map[calculateProfit(series, it)].reduce[a,b|a+b]
+        return tradingRecord.map[calculateProfit(series, it)].reduce[a,b|a+b]
 	}
 	
 	override calculate(TimeSeries series, Trade trade) {

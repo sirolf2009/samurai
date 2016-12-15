@@ -39,7 +39,7 @@ class IndicatorPendingProfit implements Indicator<Decimal> {
             val change = if(trade.getEntry().isBuy()) {
                 timeSeries.getTick(i).maxPrice.minus(timeSeries.getTick(entryIndex).closePrice)
             } else {
-                timeSeries.getTick(entryIndex).minPrice.minus(timeSeries.getTick(i).closePrice)
+                timeSeries.getTick(entryIndex).closePrice.minus(timeSeries.getTick(i).minPrice)
             }
             values.add(change.max(Decimal.ZERO))
         }

@@ -3,14 +3,14 @@ package com.sirolf2009.samurai.renderer.chart
 import eu.verdelhan.ta4j.Decimal
 import eu.verdelhan.ta4j.Indicator
 import eu.verdelhan.ta4j.TimeSeries
-import eu.verdelhan.ta4j.TradingRecord
+import eu.verdelhan.ta4j.TradesRecord
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data class ChartData {
 	
 	TimeSeries timeseries
-	TradingRecord tradingrecord
+	TradesRecord tradingrecord
 	List<Pair<Integer, List<Indicator<Decimal>>>> indicators
 	List<Pair<Integer, Marker>> markers
 	

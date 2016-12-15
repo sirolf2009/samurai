@@ -3,13 +3,13 @@ package com.sirolf2009.samurai.criterion
 import com.sirolf2009.samurai.indicator.IndicatorPendingLoss
 import eu.verdelhan.ta4j.TimeSeries
 import eu.verdelhan.ta4j.Trade
-import eu.verdelhan.ta4j.TradingRecord
+import eu.verdelhan.ta4j.TradesRecord
 import eu.verdelhan.ta4j.analysis.criteria.AbstractAnalysisCriterion
 
 class BiggestPendingLossCriterion extends AbstractAnalysisCriterion {
 	
-	override calculate(TimeSeries series, TradingRecord tradingRecord) {
-		tradingRecord.trades.map[calculate(series, it)].max()
+	override calculate(TimeSeries series, TradesRecord tradingRecord) {
+		tradingRecord.map[calculate(series, it)].max()
 	}
 
 	override calculate(TimeSeries series, Trade trade) {

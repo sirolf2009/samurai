@@ -39,7 +39,7 @@ class IndicatorPendingLoss implements Indicator<Decimal> {
             val change = if(trade.getEntry().isBuy()) {
                 timeSeries.getTick(i).minPrice.minus(timeSeries.getTick(entryIndex).closePrice)
             } else {
-                timeSeries.getTick(entryIndex).maxPrice.minus(timeSeries.getTick(i).closePrice)
+                timeSeries.getTick(entryIndex).closePrice.minus(timeSeries.getTick(i).maxPrice)
             }
             values.add(change.multipliedBy(Decimal.valueOf(-1)).max(Decimal.ZERO))
         }
