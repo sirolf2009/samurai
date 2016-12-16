@@ -21,6 +21,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 		updateMessage("Running backtest")
 		val portfolio = new Portfolio()
 		strategy.setupLongingStrategy(series).map[series.run(it, OrderType.BUY)].ifPresent[portfolio.tradingRecords.add(it)]
+		updateProgress(0.5, 1)
 		strategy.setupShortingStrategy(series).map[series.run(it, OrderType.SELL)].ifPresent[portfolio.tradingRecords.add(it)]
 		return portfolio
 	}

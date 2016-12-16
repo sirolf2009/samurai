@@ -52,7 +52,7 @@ import static com.sirolf2009.samurai.renderer.chart.ChartSettings.*
 			}
 		]
 		canvas.onMouseDragged = [
-			if(button == MouseButton.PRIMARY) {
+			if(button == MouseButton.PRIMARY && dragDetector != null) {
 				dragDetector.onMouseEvent(it)
 				draw()
 			}
