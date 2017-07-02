@@ -23,7 +23,7 @@ class Registered {
 		val registeredClasses = reflections.getTypesAnnotatedWith(Register)
 		
 		strategies.clear()
-		registeredClasses.filter[interfaces.findFirst[IStrategy.isAssignableFrom(it)] != null].forEach [
+		registeredClasses.filter[interfaces.findFirst[IStrategy.isAssignableFrom(it)] !== null].forEach [
 			val annotation = (annotations.findFirst[annotationType == Register] as Register)
 			strategies.add(new Registration<IStrategy>(it as Class<? extends IStrategy>, annotation.name, annotation.type))
 		]
@@ -35,7 +35,7 @@ class Registered {
 		]
 		
 		optimizers.clear()
-		registeredClasses.filter[interfaces.findFirst[IOptimizer.isAssignableFrom(it)] != null].forEach [
+		registeredClasses.filter[interfaces.findFirst[IOptimizer.isAssignableFrom(it)] !== null].forEach [
 			val annotation = (annotations.findFirst[annotationType == Register] as Register)
 			optimizers.add(new Registration<IOptimizer>(it as Class<? extends IOptimizer>, annotation.name, annotation.type))
 		]

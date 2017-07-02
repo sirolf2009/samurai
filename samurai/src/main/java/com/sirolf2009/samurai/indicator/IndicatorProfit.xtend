@@ -23,7 +23,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 		for(var i = 0; i < timeSeries.tickCount; i++) {
 			val index = i
 			val trade = record.trades.findFirst[exit.index == index]
-			if(trade != null) {
+			if(trade !== null) {
 				profit = profit.plus(Decimal.valueOf(profitCalc.calculate(timeSeries, trade)))
 			}
 			values.add(index, profit)

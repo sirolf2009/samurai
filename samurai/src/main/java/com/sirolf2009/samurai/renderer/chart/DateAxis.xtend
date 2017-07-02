@@ -1,12 +1,12 @@
 package com.sirolf2009.samurai.renderer.chart
 
-import java.util.List
-import org.eclipse.xtend.lib.annotations.Data
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
+import java.text.SimpleDateFormat
+import java.time.ZonedDateTime
 import java.util.ArrayList
-import org.joda.time.format.DateTimeFormatter
+import java.util.List
 import javafx.geometry.Bounds
+import org.eclipse.xtend.lib.annotations.Data
+import java.util.Date
 
 @Data class DateAxis extends Axis {
 
@@ -17,18 +17,18 @@ import javafx.geometry.Bounds
 	static val WEEK = DAY * 7
 	static val MONTH = WEEK * 52
 
-	static val SECOND_SPEC = new TickSpecification(SECOND, DateTimeFormat.forPattern("HH:mm:ss"), #[1, 2, 3, 5, 10, 15, 30])
-	static val MINUTE_SPEC = new TickSpecification(MINUTE, DateTimeFormat.forPattern("HH:mm"), #[1, 2, 3, 5, 10, 15, 30])
-	static val HOUR_SPEC = new TickSpecification(HOUR, DateTimeFormat.forPattern("MM/dd HH:mm"), #[1, 2, 3, 4, 6, 8, 12])
-	static val DAY_SPEC = new TickSpecification(DAY, DateTimeFormat.forPattern("MM/dd"), #[1, 2, 7])
-	static val WEEK_SPEC = new TickSpecification(WEEK, DateTimeFormat.forPattern("yyyy/MM/dd"), #[1, 2, 4])
-	static val MONTH_SPEC = new TickSpecification(MONTH, DateTimeFormat.forPattern("yyyy/MM"), #[1, 2, 3, 4, 6])
+	static val SECOND_SPEC = new TickSpecification(SECOND, new SimpleDateFormat("HH:mm:ss"), #[1, 2, 3, 5, 10, 15, 30])
+	static val MINUTE_SPEC = new TickSpecification(MINUTE, new SimpleDateFormat("HH:mm"), #[1, 2, 3, 5, 10, 15, 30])
+	static val HOUR_SPEC = new TickSpecification(HOUR, new SimpleDateFormat("MM/dd HH:mm"), #[1, 2, 3, 4, 6, 8, 12])
+	static val DAY_SPEC = new TickSpecification(DAY, new SimpleDateFormat("MM/dd"), #[1, 2, 7])
+	static val WEEK_SPEC = new TickSpecification(WEEK, new SimpleDateFormat("yyyy/MM/dd"), #[1, 2, 4])
+	static val MONTH_SPEC = new TickSpecification(MONTH, new SimpleDateFormat("yyyy/MM"), #[1, 2, 3, 4, 6])
 
-	DateTime from
-	DateTime to
+	ZonedDateTime from
+	ZonedDateTime to
 
-	def static DateAxis fromRange(DateTime from, DateTime to, Bounds bounds) {
-		val range = (to.millis - from.millis) / bounds.width * 400 // millis per 400 pixels
+	def static DateAxis fromRange(ZonedDateTime from, ZonedDateTime to, Bounds bounds) {
+		val range = (to.toEpochSecond - from.toEpochSecond) / bounds.width * 400 // millis per 400 pixels
 		val tickSpec = if(range < MINUTE * 2) {
 				SECOND_SPEC
 			} else if(range < HOUR * 2) {
@@ -46,8 +46,8 @@ import javafx.geometry.Bounds
 		val format = tickSpec.format
 
 		val ticks = new ArrayList()
-		for (var i = from.millis; i < to.millis; i += tick) {
-			ticks.add(format.print(new DateTime(i)))
+		for (var i = from.toEpochSecond; i < to.toEpochSecond; i += tick) {
+			ticks.add(format.format(new Date(i*1000)))
 		}
 		return new DateAxis(bounds, ticks, tick, from, to)
 	}
@@ -55,7 +55,7 @@ import javafx.geometry.Bounds
 	@Data static class TickSpecification {
 
 		long tick
-		DateTimeFormatter format
+		SimpleDateFormat format
 		List<Integer> multipliers
 
 		def multipliedTick(double range) {

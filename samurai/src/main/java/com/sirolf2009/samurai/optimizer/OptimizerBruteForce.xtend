@@ -47,7 +47,7 @@ class OptimizerBruteForce implements IOptimizer {
 		table.columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
 		table.columns.add(new TableColumn<List<String>, String>("Fitness") => [
 			cellValueFactory = [
-				if(value != null) {
+				if(value !== null) {
 					val list = value
 					return new SimpleStringProperty(list.get(0))
 				}
@@ -57,7 +57,7 @@ class OptimizerBruteForce implements IOptimizer {
 		possibleValues.map[key.name].forEach [ it, index |
 			table.columns.add(new TableColumn<List<String>, String>(it) => [
 				cellValueFactory = [
-					if(value != null) {
+					if(value !== null) {
 						val list = value
 						return new SimpleStringProperty(list.get(index + 1))
 					}
@@ -140,7 +140,7 @@ class OptimizerBruteForce implements IOptimizer {
 		parameters.propertyEditorFactory = new RangePropertyEditorFactory()
 		parameterPane.content = parameters
 		strategy.class.declaredFields.filter [
-			annotations.findFirst[it.annotationType == Param] != null
+			annotations.findFirst[it.annotationType == Param] !== null
 		].forEach [ field, index |
 			val descriptor = new PropertyDescriptor(field.name, strategy.class)
 			val defaultValue = descriptor.readMethod.invoke(strategy) as Integer

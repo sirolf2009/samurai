@@ -2,22 +2,22 @@ package com.sirolf2009.samurai.dataprovider
 
 import eu.verdelhan.ta4j.Tick
 import eu.verdelhan.ta4j.TimeSeries
+import java.time.Duration
+import java.time.ZonedDateTime
 import java.util.ArrayList
 import java.util.List
 import javafx.concurrent.Task
 import org.eclipse.xtend.lib.annotations.Accessors
-import org.joda.time.DateTime
-import org.joda.time.Period
 
 abstract class DataProvider extends Task<TimeSeries> {
 	
-	@Accessors var Period period
-	@Accessors var DateTime from
-	@Accessors var DateTime to
+	@Accessors var Duration period
+	@Accessors var ZonedDateTime from
+	@Accessors var ZonedDateTime to
 	
 	public var progress = 0
 	
-	def static List<Tick> buildEmptyTicks(DateTime beginTime, DateTime endTime, Period period) {
+	def static List<Tick> buildEmptyTicks(ZonedDateTime beginTime, ZonedDateTime endTime, Duration period) {
 		val emptyTicks = new ArrayList<Tick>()
 
 		var tickEndTime = beginTime

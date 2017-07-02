@@ -18,9 +18,9 @@ class PickerParameters extends TitledPane {
 		objectProperty.addListener [ observable |
 			val it = (observable as ObjectProperty<? extends Object>).get
 			parameters.items.clear()
-			if(it != null) {
+			if(it !== null) {
 				it.class.declaredFields.filter [
-					annotations.findFirst[it.annotationType == Param] != null
+					annotations.findFirst[it.annotationType == Param] !== null
 				].forEach [ field, index |
 					parameters.items.add(new BeanProperty(it, new PropertyDescriptor(field.name, it.class)))
 				]

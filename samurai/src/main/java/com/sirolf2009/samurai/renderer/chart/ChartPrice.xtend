@@ -28,7 +28,7 @@ class ChartPrice extends Chart {
 	}
 
 	override draw() {
-		if(series != null) {
+		if(series !== null) {
 			save()
 			clearScreen(g)
 

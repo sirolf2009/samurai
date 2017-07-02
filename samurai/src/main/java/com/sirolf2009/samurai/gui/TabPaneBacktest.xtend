@@ -1,7 +1,6 @@
 package com.sirolf2009.samurai.gui
 
 import com.sirolf2009.samurai.criterion.AbsoluteProfitCriterion
-import com.sirolf2009.samurai.gui.TabPaneBacktest.TableTrade
 import com.sirolf2009.samurai.indicator.IndicatorAbsoluteCashFlow
 import com.sirolf2009.samurai.renderer.chart.Chart
 import com.sirolf2009.samurai.renderer.chart.ChartData

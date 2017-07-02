@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.sirolf2009</groupId>
 	<artifactId>samurai</artifactId>
@@ -7,7 +8,7 @@
 	<name>Samurai - a TA4J GUI </name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<xtend.version>2.10.0</xtend.version>
+		<xtend.version>2.12.0</xtend.version>
 	</properties>
 	<build>
 		<plugins>
@@ -26,7 +27,7 @@
 					</execution>
 				</executions>
 				<configuration>
-                    <javaSourceVersion>1.8</javaSourceVersion>
+					<javaSourceVersion>1.8</javaSourceVersion>
 					<outputDirectory>${project.build.directory}/xtend-gen/main</outputDirectory>
 					<testOutputDirectory>${project.build.directory}/xtend-gen/test</testOutputDirectory>
 				</configuration>
@@ -64,11 +65,6 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<version>2.9.4</version>
-		</dependency>
-		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
 			<version>0.9.10</version>
@@ -79,4 +75,5 @@
 			<version>8.40.12</version>
 		</dependency>
 	</dependencies>
+
 </project>

@@ -30,8 +30,8 @@ class ChartScatter extends Chart {
 		save()
 		clearScreen(g)
 		val panelWidth = canvas.width - Y_AXIS_SIZE - AXIS_OFFSET
-		val xList = vectors.filter[it != null].map[Double.valueOf(x)].toList()
-		val yList = vectors.filter[it != null].map[Double.valueOf(y)].toList()
+		val xList = vectors.filter[it !== null].map[Double.valueOf(x)].toList()
+		val yList = vectors.filter[it !== null].map[Double.valueOf(y)].toList()
 		val startX = xList.min()
 		val endX = xList.max()
 

@@ -1,11 +1,13 @@
 package com.sirolf2009.samurai.dataprovider
 
+import com.sirolf2009.samurai.annotations.Register
 import eu.verdelhan.ta4j.TimeSeries
 import java.io.File
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.Date
 import java.util.LinkedList
 import java.util.Scanner
-import org.joda.time.DateTime
-import com.sirolf2009.samurai.annotations.Register
 
 class DataProviderBitcoinCharts extends DataProvider {
 
@@ -34,7 +36,8 @@ class DataProviderBitcoinCharts extends DataProvider {
 		while(scanner.hasNextLine() && !isCancelled) {
 			val line = scanner.nextLine()
 			val data = line.split(",")
-			val time = new DateTime(Long.parseLong(data.get(0)) * 1000)
+			val time = ZonedDateTime.ofInstant(new Date(Long.parseLong(data.get(0))*1000).toInstant(), ZoneId.systemDefault())
+
 			while(ticksQueue.size > 0 && !ticksQueue.peek.inPeriod(time)) {
 				ticksQueue.poll
 			}
@@ -43,7 +46,7 @@ class DataProviderBitcoinCharts extends DataProvider {
 					val price = Double.parseDouble(data.get(1))
 					val amount = Double.parseDouble(data.get(2))
 					addTrade(amount, price)
-					updateMessage("Loading " + time.getYear + "-" + time.getMonthOfYear + "-" + time.getDayOfMonth)
+					updateMessage("Loading " + time.getYear + "-" + time.monthValue + "-" + time.getDayOfMonth)
 				]
 			}
 			progress += line.bytes.length

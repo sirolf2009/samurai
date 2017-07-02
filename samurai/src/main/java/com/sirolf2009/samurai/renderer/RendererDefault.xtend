@@ -156,7 +156,7 @@ class RendererDefault implements IRenderer {
 		g.setStroke(Color.CYAN)
 		g.fill = Color.CYAN
 		vectors.forEach [ tick, index |
-			if(tick != null) {
+			if(tick !== null) {
 				g.fillOval(axisX.map(tick.x) - 1, axisY.map(tick.y) - 1, 3, 3)
 			}
 		]

@@ -30,7 +30,7 @@ class GUIUtil {
 	}
 
 	def static <T> void expandAllNodes(TreeItem<T> item) {
-		if(item != null && !item.isLeaf) {
+		if(item !== null && !item.isLeaf) {
 			item.expanded = true
 			item.children.forEach[expandAllNodes]
 		}

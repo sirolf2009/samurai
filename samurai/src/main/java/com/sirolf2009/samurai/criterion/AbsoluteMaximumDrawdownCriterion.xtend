@@ -16,7 +16,7 @@ class AbsoluteMaximumDrawdownCriterion extends AbstractAnalysisCriterion {
 	}
 
 	override calculate(TimeSeries series, Trade trade) {
-		if(trade != null && trade.entry != null && trade.exit != null) {
+		if(trade !== null && trade.entry !== null && trade.exit !== null) {
 			val cashFlow = new IndicatorAbsoluteCashFlow(series, trade)
 			val maximumDrawdown = calculateMaximumDrawdown(series, cashFlow)
 			return maximumDrawdown.toDouble()

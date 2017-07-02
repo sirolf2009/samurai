@@ -6,15 +6,15 @@ import com.sirolf2009.samurai.gui.picker.PickerOptimizer
 import com.sirolf2009.samurai.gui.picker.PickerOptimizerParameters
 import com.sirolf2009.samurai.gui.picker.PickerStrategy
 import com.sirolf2009.samurai.gui.picker.PickerTimeframe
+import com.sirolf2009.samurai.optimizer.IOptimizer
 import com.sirolf2009.samurai.strategy.IStrategy
+import java.time.Duration
+import java.time.ZonedDateTime
 import javafx.beans.InvalidationListener
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.layout.VBox
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.Data
-import org.joda.time.DateTime
-import org.joda.time.Period
-import com.sirolf2009.samurai.optimizer.IOptimizer
 
 @Accessors class SetupOptimize extends VBox {
 
@@ -71,7 +71,7 @@ import com.sirolf2009.samurai.optimizer.IOptimizer
 		pickerDataProvider.expanded = true
 
 		val InvalidationListener objectUpdater = [
-			if(pickerDataProvider.providerProperty.get != null && pickerStrategy.strategyProperty.get != null && pickerTimeframe.getTimeframeProperty.get != null) {
+			if(pickerDataProvider.providerProperty.get !== null && pickerStrategy.strategyProperty.get !== null && pickerTimeframe.getTimeframeProperty.get !== null) {
 				val provider = pickerDataProvider.providerProperty.get().get() => [
 					period = pickerTimeframe.periodProperty.get()
 					from = pickerTimeframe.fromProperty.get()
@@ -94,9 +94,9 @@ import com.sirolf2009.samurai.optimizer.IOptimizer
 		DataProvider dataProvider
 		IStrategy strategy
 		IOptimizer optimizer
-		Period period
-		DateTime from
-		DateTime to
+		Duration period
+		ZonedDateTime from
+		ZonedDateTime to
 
 	}
 
