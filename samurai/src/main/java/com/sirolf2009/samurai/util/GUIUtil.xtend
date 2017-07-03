@@ -46,14 +46,12 @@ class GUIUtil {
 		// a styled background to achieve the same effect.
 		for (Node n : grid.getChildren()) {
 			if(n instanceof Control) {
-				val control = n as Control
-				control.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE)
-				control.setStyle("-fx-background-color: whitesmoke; -fx-alignment: center;")
+				n.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE)
+				n.setStyle("-fx-background-color: whitesmoke; -fx-alignment: center;")
 			}
 			if(n instanceof Pane) {
-				val pane = n as Pane
-				pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE)
-				pane.setStyle("-fx-background-color: whitesmoke; -fx-alignment: center;")
+				n.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE)
+				n.setStyle("-fx-background-color: whitesmoke; -fx-alignment: center;")
 			}
 		}
 
