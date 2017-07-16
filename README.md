@@ -7,6 +7,16 @@ At some point, this will also support automated trading.
 
 <b>Note that this is still a work in progress application and it is not yet functional enough to be used.</b>
 
+## Installation
+1. This library requires a dependency which isn't on maven central. It's called xtendfx and you can find it here: https://github.com/svenefftinge/xtendfx
+2. You'll also need to get my forked version of ta4j. <b>The official version will not work (yet)</b>. You can find it here: https://github.com/sirolf2009/ta4j
+3. run 
+```bash
+git clone https://github.com/sirolf2009/samurai.git
+cd samurai/samurai
+mvn install
+```
+
 ## Strategies examples
 ```xtend
 class StrategySMACrossover implements IStrategy {
