@@ -6,6 +6,7 @@ You will be able to use all the TA4J built-in and custom indicators to create yo
 At some point, this will also support automated trading.
 
 <b>Note that this is still a work in progress application and it is not yet functional enough to be used.</b>
+<b>EDIT: you know those people who start projects and never finish them? I'm one of those people. I'm not finishing this project, but you can do whatever you want with it</b>
 
 ## Installation
 1. This library requires a dependency which isn't on maven central. It's called xtendfx and you can find it here: https://github.com/svenefftinge/xtendfx
